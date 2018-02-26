@@ -5,3 +5,44 @@
 [![CodeDocs](https://codedocs.xyz/char-lie/stereo-vision.svg)](https://codedocs.xyz/char-lie/stereo-vision/)
 
 Implementation of algorithms for stereo vision.
+
+# Development
+
+## Build
+
+It's recommended to build the project in separate `build` folder
+
+```bash
+mkdir -p build && cd build
+```
+
+The project uses [CMake](https://cmake.org/) and it's very easy in use.
+Just execute the following code from the `build` directory
+
+```bash
+cmake .. && cmake --build .
+```
+
+## Unit tests
+
+The project uses [GTest](https://github.com/google/googletest) framework.
+To run tests you can execute unit tests from `build` directory of built project
+
+```bash
+make test
+```
+
+You can use `ctest` as well.
+For verbose output with colors use
+
+```bash
+GTEST_COLOR=1 ctest -V
+```
+
+## Autobuild
+
+Go to your `build` directory and execute `watch`
+
+```bash
+watch --color "cmake .. && cmake --build . && GTEST_COLOR=1 ctest -V | tail"
+```
