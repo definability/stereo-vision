@@ -1,2 +1,3 @@
-# stereovision
-Implementation of algorithms for stereo vision
+# Stereo Vision
+
+Implementation of algorithms for stereo vision.
