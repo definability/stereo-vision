@@ -6,7 +6,8 @@ include(ExternalProject)
 # Download and install GoogleTest
 ExternalProject_Add(
     gtest
-    URL https://github.com/google/googletest/archive/release-1.8.0.zip
+    URL https://codeload.github.com/google/googletest/zip/release-1.8.0
+    DOWNLOAD_NAME googletest-release-1.8.0.zip
     URL_MD5 adfafc8512ab65fd3cf7955ef0100ff5
     URL_HASH SHA512=ebbe4110c10dcde30d480273ed05243bfd1bc123057bb86247dab0a1e662bba8ad0d90fc0356a073ea0f197f029844616a18a03c5492d35f85d8c9ddaf885f97
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
