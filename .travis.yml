@@ -43,11 +43,11 @@ matrix:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
 before_install:
-    - eval "${MATRIX_EVAL}"
+  - eval "${MATRIX_EVAL}"
+  - mkdir build && cd build
+
+install:
+  - cmake .. && cmake --build .
 
 script:
-  - mkdir build
-  - cd build
-  - cmake ..
-  - cmake --build .
   - GTEST_COLOR=1 ctest -V
