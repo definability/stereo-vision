@@ -14,7 +14,6 @@ if (DOXYGEN_FOUND AND BUILD_DOC)
 
     # request to configure the file
     configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-    message("Doxygen build started")
 
     # note the option ALL which allows to build the docs together with the application
     add_custom_target(
@@ -25,5 +24,5 @@ if (DOXYGEN_FOUND AND BUILD_DOC)
         VERBATIM
     )
 elseif(BUILD_DOC)
-  message("Doxygen need to be installed to generate the doxygen documentation")
+  message("Doxygen needs to be installed to generate the doxygen documentation.")
 endif (DOXYGEN_FOUND AND BUILD_DOC)
