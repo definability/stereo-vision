@@ -9,6 +9,13 @@ using std::vector;
 using std::move;
 using std::invalid_argument;
 
+/**
+ * \brief The Matrix is a storage for pixels of images.
+ *
+ * Images may be grayscale,
+ * contain RGB or RGBA color channels,
+ * that's why a template parameter T is needed.
+ */
 template<typename T> class Matrix {
     private:
         vector<vector<T> > data;
@@ -35,6 +42,13 @@ template<typename T> class Matrix {
             return this->rows_;
         }
 
+        /**
+         * \brief An ability to read and write colors in particular pixels.
+         *
+         * Don't rely on a vector type of the output hardly.
+         * Use it only to read and write particular pixels,
+         * because behavior may change in future.
+         */
         vector<T>& operator[](size_t index) {
             return this->data[index];
         }
