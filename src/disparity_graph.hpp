@@ -46,7 +46,7 @@ template<typename Color> class DisparityGraph {
             this->checkNode_(rowB, columnB, disparityB);
         }
         bool edgeExists_(size_t rowA, size_t columnA, size_t disparityA,
-                        size_t rowB, size_t columnB, size_t disparityB) const {
+                         size_t rowB, size_t columnB, size_t disparityB) const {
             this->checkEdge_(rowA, columnA, rowB, columnB,
                              disparityA, disparityB);
 
@@ -83,7 +83,7 @@ template<typename Color> class DisparityGraph {
             return difference * difference;
         }
         double penalty_(size_t rowA, size_t columnA, size_t disparityA,
-                       size_t rowB, size_t columnB, size_t disparityB) {
+                        size_t rowB, size_t columnB, size_t disparityB) {
             this->checkEdge_(rowA, columnA, rowB, columnB,
                              disparityA, disparityB);
             if (!this->edgeExists_(rowA, columnA, disparityA,
