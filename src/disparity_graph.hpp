@@ -1,12 +1,15 @@
 #ifndef DISPARITY_GRAPH_HPP
 #define DISPARITY_GRAPH_HPP
 
+#include <cassert>
 #include <limits>
 #include <stdexcept>
+#include <utility>
 
 #include "matrix.hpp"
 
 using std::invalid_argument;
+using std::swap;
 
 /**
  * \brief A graph that stores a pair of given images and possible disparities.
@@ -27,96 +30,135 @@ template<typename Color> class DisparityGraph {
         Matrix<Color> leftImage_;
         Matrix<Color> rightImage_;
 
-        void checkNode_(size_t row, size_t column, size_t disparity) const {
-            if (row >= this->rightImage_.rows()) {
+        /**
+         * \brief Check that the node exists in this graph.
+         *
+         * Node coordinates should not be out of the right image.
+         * Disparity should not lead out of the left image.
+         */
+        void checkNode_(const Node& node) const {
+            if (node.row >= this->rightImage_.rows()) {
                 throw invalid_argument(
                     "Row should not be greater than the last one.");
-            } else if (column >= this->rightImage_.columns()) {
+            } else if (node.column >= this->rightImage_.columns()) {
                 throw invalid_argument(
                     "Column should not be greater than the last one.");
-            } else if (column + disparity >= this->leftImage_.columns()) {
+            } else if (node.column + node.disparity
+                       >= this->leftImage_.columns()) {
                 throw invalid_argument(
                     "Disparity should not lead to image overflow.");
             }
         }
-        void checkEdge_(size_t rowA, size_t columnA,
-                        size_t rowB, size_t columnB,
-                        size_t disparityA, size_t disparityB) const {
-            this->checkNode_(rowA, columnA, disparityA);
-            this->checkNode_(rowB, columnB, disparityB);
+        /**
+         * \brief Check that given nodes may be connected by an edge
+         * in the graph.
+         *
+         * Both nodes should exist.
+         *
+         * A pixel cannot be a naighbor of itself.
+         */
+        void checkEdge_(const Node& nodeA, const Node& nodeB) const {
+            if (nodeA.column == nodeB.column && nodeA.row == nodeB.row) {
+                throw invalid_argument(
+                    "A pixel cannot be connected with itself.");
+            }
+            this->checkNode_(nodeA);
+            this->checkNode_(nodeB);
         }
-        bool edgeExists_(size_t rowA, size_t columnA, size_t disparityA,
-                         size_t rowB, size_t columnB, size_t disparityB) const {
-            this->checkEdge_(rowA, columnA, rowB, columnB,
-                             disparityA, disparityB);
+        /**
+         * \brief Check that given nodes are connected by an edge
+         * in the graph.
+         *
+         * Only nearest pixels may be connected.
+         * This means, that two nodes should differ
+         * eigher by column or by row, no both at the same time.
+         *
+         * If a pixel of the right image
+         * is located to the right of its neighbor,
+         * it can point to either the same pixel as its neighbor
+         * or at the righter one --- it cannot correspond to a pixel
+         * that is to the left of corresponding pixel of its left neighbor.
+         */
+        bool edgeExists_(const Node& nodeA, const Node& nodeB) const {
+            this->checkEdge_(nodeA, nodeB);
 
-            if (rowA != rowB && columnA != columnB) {
+            if (nodeA.row != nodeB.row && nodeA.column != nodeB.column) {
                 return false;
-            } else if (rowA == rowB
-                    && (columnA != columnB + 1 && columnA != columnB - 1)) {
-                return false;
-            } else if (columnA == columnB
-                    && (rowA != rowB + 1 && rowA != rowB - 1)) {
-                return false;
-            } else if (rowA == rowB) {
-                if (columnA == columnB - 1 && disparityB < disparityA - 1) {
-                    return false;
-                } else if (columnB == columnA - 1
-                        && disparityA < disparityB - 1) {
-                    return false;
-                } else {
-                    return true;
-                }
-            } else {
-                return true;
             }
-        }
-        size_t nodeNeighborsCount_(size_t row, size_t column) const {
-            return (row > 0) + (row < this->rightImage_.rows())
-                + (column > 0) + (column < this->rightImage_.columns());
-        }
-        double nodePenalty_(size_t row, size_t column, size_t disparity) {
-            this->checkNode_(row, column, disparity);
-            double difference = static_cast<double>(
-                this->rightImage_[row][column])
-                - this->leftImage_[row][column + disparity];
-            return difference * difference;
-        }
-        double penalty_(size_t rowA, size_t columnA, size_t disparityA,
-                        size_t rowB, size_t columnB, size_t disparityB) {
-            this->checkEdge_(rowA, columnA, rowB, columnB,
-                             disparityA, disparityB);
-            if (!this->edgeExists_(rowA, columnA, disparityA,
-                                   rowB, columnB, disparityB)) {
-                return std::numeric_limits<double>::infinity();
+
+            size_t topRow = nodeA.row;
+            size_t bottomRow = nodeB.row;
+            if (topRow < bottomRow) {
+                swap(topRow, bottomRow);
             }
-            double nodesPenalty =
-                this->nodePenalty_(rowA, columnA, disparityA)
-                    / this->nodeNeighborsCount_(rowA, columnA)
-                + this->nodePenalty_(rowB, columnB, disparityB)
-                    / this->nodeNeighborsCount_(rowB, columnB);
-            double neighboringPenalty = (disparityA - disparityB)
-                                      * (disparityA - disparityB);
-            return nodesPenalty + neighboringPenalty;
+            if (bottomRow - topRow > 1) {
+                return false;
+            }
+
+            size_t leftColumn = nodeA.column;
+            size_t leftDisparity = nodeA.disparity;
+            size_t rightColumn = nodeB.column;
+            size_t rightDisparity = nodeB.disparity;
+            if (leftColumn > rightColumn) {
+                swap(leftColumn, rightColumn);
+                swap(leftDisparity, rightDisparity);
+            }
+            if (rightColumn - leftColumn > 1
+                    || rightDisparity > leftDisparity + 1) {
+                return false;
+            }
+
+            return true;
+        }
+        /**
+         * \brief Calculate number of neighbor nodes of the given one.
+         *
+         * There are four possible neighbors:
+         * left, right, top and bottom.
+         *
+         * If the pixel of located in a corder or on a border,
+         * it obviously has less number of neighbors.
+         */
+        size_t nodeNeighborsCount_(const Node& node) const {
+            return
+                (node.row > 0)
+                + (node.row < this->rightImage_.rows())
+                + (node.column > 0)
+                + (node.column < this->rightImage_.columns());
         }
     public:
         DisparityGraph(const DisparityGraph& graph) = default;
         DisparityGraph(DisparityGraph&& graph) = default;
         DisparityGraph(const Matrix<Color>& leftImage,
                        const Matrix<Color>& rightImage)
-            : leftImage_{leftImage}
-            , rightImage_{rightImage} {
+                : leftImage_{leftImage}
+                , rightImage_{rightImage} {
+            if (leftImage.columns() != rightImage.columns()) {
+                throw invalid_argument(
+                    "Images should have the same number of columns.");
+            }
         }
         ~DisparityGraph() = default;
+        double penalty(const Node& nodeA, const Node& nodeB) {
+            if (!this->edgeExists_(nodeA, nodeB)) {
+                return std::numeric_limits<double>::infinity();
+            }
+            double nodesPenalty =
+                this->nodePenalty(nodeA) / this->nodeNeighborsCount_(nodeA)
+                + this->nodePenalty(nodeB) / this->nodeNeighborsCount_(nodeB);
+            double neighboringPenalty = (nodeA.disparity - nodeB.disparity)
+                                      * (nodeA.disparity - nodeB.disparity);
+            return nodesPenalty + neighboringPenalty;
+        }
         double nodePenalty(const Node& node) {
-            return this->nodePenalty_(node.row, node.column, node.disparity);
+            this->checkNode_(node);
+            double difference = static_cast<double>(
+                this->rightImage_[node.row][node.column])
+                - this->leftImage_[node.row][node.column + node.disparity];
+            return difference * difference;
         }
         double nodePenalty(size_t row, size_t column, size_t disparity) {
-            return this->nodePenalty_(row, column, disparity);
-        }
-        double penalty(const Node& nodeA, const Node& nodeB) {
-            return this->penalty_(nodeA.row, nodeA.column, nodeA.disparity,
-                                  nodeB.row, nodeB.column, nodeB.disparity);
+            return this->nodePenalty({row, column, disparity});
         }
 };
 
