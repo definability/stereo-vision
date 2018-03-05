@@ -34,6 +34,9 @@ TEST(DisparityGraphTest, EdgesPenalty) {
 
     ASSERT_DOUBLE_EQ(graph.penalty({0, 5, 2}, {0, 6, 3}), 1);
     ASSERT_DOUBLE_EQ(graph.penalty({0, 6, 3}, {0, 5, 2}), 1);
+
+    ASSERT_TRUE(graph.edgeExists({0, 5, 2}, {0, 6, 3}));
+    ASSERT_TRUE(graph.edgeExists({0, 6, 3}, {0, 5, 2}));
 }
 
 TEST(DisparityGraphTest, DiagonalInf) {
@@ -44,6 +47,9 @@ TEST(DisparityGraphTest, DiagonalInf) {
                      numeric_limits<double>::infinity());
     ASSERT_DOUBLE_EQ(graph.penalty({0, 1}, {1, 0}),
                      numeric_limits<double>::infinity());
+
+    ASSERT_FALSE(graph.edgeExists({1, 0}, {0, 1}));
+    ASSERT_FALSE(graph.edgeExists({0, 1}, {1, 0}));
 }
 
 TEST(DisparityGraphTest, FarHorizontalInf) {
@@ -54,6 +60,9 @@ TEST(DisparityGraphTest, FarHorizontalInf) {
                      numeric_limits<double>::infinity());
     ASSERT_DOUBLE_EQ(graph.penalty({0, 5}, {0, 0}),
                      numeric_limits<double>::infinity());
+
+    ASSERT_FALSE(graph.edgeExists({0, 0}, {0, 5}));
+    ASSERT_FALSE(graph.edgeExists({0, 5}, {0, 0}));
 }
 
 TEST(DisparityGraphTest, FarVerticalInf) {
@@ -64,6 +73,9 @@ TEST(DisparityGraphTest, FarVerticalInf) {
                      numeric_limits<double>::infinity());
     ASSERT_DOUBLE_EQ(graph.penalty({5, 0}, {0, 0}),
                      numeric_limits<double>::infinity());
+
+    ASSERT_FALSE(graph.edgeExists({0, 0}, {5, 0}));
+    ASSERT_FALSE(graph.edgeExists({5, 0}, {0, 0}));
 }
 
 TEST(DisparityGraphTest, WrongDisparitiesInf) {
@@ -74,4 +86,7 @@ TEST(DisparityGraphTest, WrongDisparitiesInf) {
                      numeric_limits<double>::infinity());
     ASSERT_DOUBLE_EQ(graph.penalty({0, 6, 4}, {0, 5, 2}),
                      numeric_limits<double>::infinity());
+
+    ASSERT_FALSE(graph.edgeExists({0, 5, 2}, {0, 6, 4}));
+    ASSERT_FALSE(graph.edgeExists({0, 6, 4}, {0, 5, 2}));
 }
