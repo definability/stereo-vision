@@ -70,6 +70,57 @@ template<typename Color> class DisparityGraph {
             this->checkNode_(nodeB);
         }
         /**
+         * \brief Calculate number of neighbor nodes of the given one.
+         *
+         * There are four possible neighbors:
+         * left, right, top and bottom.
+         *
+         * If the pixel of located in a corder or on a border,
+         * it obviously has less number of neighbors.
+         */
+        size_t nodeNeighborsCount_(const Node& node) const {
+            return
+                (node.row > 0)
+                + (node.row < this->rightImage_.rows())
+                + (node.column > 0)
+                + (node.column < this->rightImage_.columns());
+        }
+    public:
+        DisparityGraph(const DisparityGraph& graph) = default;
+        DisparityGraph(DisparityGraph&& graph) = default;
+        DisparityGraph(const Matrix<Color>& leftImage,
+                       const Matrix<Color>& rightImage)
+                : leftImage_{leftImage}
+                , rightImage_{rightImage} {
+            if (leftImage.columns() != rightImage.columns()) {
+                throw invalid_argument(
+                    "Images should have the same number of columns.");
+            }
+        }
+        ~DisparityGraph() = default;
+        /**
+         * \brief Calculate a penalty of the edge between two given nodes.
+         *
+         * If nodes have wrong position and/or disparity,
+         * an exception will occur.
+         * If nodes are not connected, the weight is infinity.
+         *
+         * Otherwise, the penalty is a sum of
+         * squared difference of disparities
+         * and penalties of nodes divided by number of their neighbors.
+         */
+        double penalty(const Node& nodeA, const Node& nodeB) {
+            if (!this->edgeExists(nodeA, nodeB)) {
+                return numeric_limits<double>::infinity();
+            }
+            double nodesPenalty =
+                this->nodePenalty(nodeA) / this->nodeNeighborsCount_(nodeA)
+                + this->nodePenalty(nodeB) / this->nodeNeighborsCount_(nodeB);
+            double neighboringPenalty = (nodeA.disparity - nodeB.disparity)
+                                      * (nodeA.disparity - nodeB.disparity);
+            return nodesPenalty + neighboringPenalty;
+        }
+        /**
          * \brief Check that given nodes are connected by an edge
          * in the graph.
          *
@@ -83,7 +134,7 @@ template<typename Color> class DisparityGraph {
          * or at the righter one --- it cannot correspond to a pixel
          * that is to the left of corresponding pixel of its left neighbor.
          */
-        bool edgeExists_(const Node& nodeA, const Node& nodeB) const {
+        bool edgeExists(const Node& nodeA, const Node& nodeB) const {
             this->checkEdge_(nodeA, nodeB);
 
             if (nodeA.row != nodeB.row && nodeA.column != nodeB.column) {
@@ -115,45 +166,12 @@ template<typename Color> class DisparityGraph {
             return true;
         }
         /**
-         * \brief Calculate number of neighbor nodes of the given one.
+         * \brief Calculate a penalty of the node.
          *
-         * There are four possible neighbors:
-         * left, right, top and bottom.
-         *
-         * If the pixel of located in a corder or on a border,
-         * it obviously has less number of neighbors.
+         * The penalty is a Euclidian norm of a difference
+         * between color of the pixel of the right image
+         * and corresponding imagge of the left image.
          */
-        size_t nodeNeighborsCount_(const Node& node) const {
-            return
-                (node.row > 0)
-                + (node.row < this->rightImage_.rows())
-                + (node.column > 0)
-                + (node.column < this->rightImage_.columns());
-        }
-    public:
-        DisparityGraph(const DisparityGraph& graph) = default;
-        DisparityGraph(DisparityGraph&& graph) = default;
-        DisparityGraph(const Matrix<Color>& leftImage,
-                       const Matrix<Color>& rightImage)
-                : leftImage_{leftImage}
-                , rightImage_{rightImage} {
-            if (leftImage.columns() != rightImage.columns()) {
-                throw invalid_argument(
-                    "Images should have the same number of columns.");
-            }
-        }
-        ~DisparityGraph() = default;
-        double penalty(const Node& nodeA, const Node& nodeB) {
-            if (!this->edgeExists_(nodeA, nodeB)) {
-                return numeric_limits<double>::infinity();
-            }
-            double nodesPenalty =
-                this->nodePenalty(nodeA) / this->nodeNeighborsCount_(nodeA)
-                + this->nodePenalty(nodeB) / this->nodeNeighborsCount_(nodeB);
-            double neighboringPenalty = (nodeA.disparity - nodeB.disparity)
-                                      * (nodeA.disparity - nodeB.disparity);
-            return nodesPenalty + neighboringPenalty;
-        }
         double nodePenalty(const Node& node) {
             this->checkNode_(node);
             double difference = static_cast<double>(
