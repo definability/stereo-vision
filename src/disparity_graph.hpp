@@ -18,16 +18,22 @@ using std::swap;
 struct DisparityNode {
     /**
      * \brief Row on which the node located.
+     *
+     * Denoted in formulas as \f$t_x\f$.
      */
     size_t row;
     /**
      * \brief Column on which the node located.
+     *
+     * Denoted in formulas as \f$t_y\f$.
      */
     size_t column;
     /**
      * \brief Disparity is an offset
      * between the pixel on a right image
      * and corresponding one on a left image.
+     *
+     * Denoted in formulas as a label \f$k\f$.
      */
     size_t disparity;
 };
@@ -144,6 +150,10 @@ template<typename Color> class DisparityGraph {
          * an exception will occur.
          * If nodes are not connected, the weight is infinity.
          *
+         * \f[
+         *  g_{tt'}\left( k, k' \right ) = \infty, \qquad tt' \notin \tau.
+         * \f]
+         *
          * Otherwise, the penalty is a sum of
          * squared difference of disparities
          * and penalties of nodes divided by number of their neighbors
@@ -155,7 +165,9 @@ template<typename Color> class DisparityGraph {
          *             {\left| N\left( t \right ) \right|}
          *      + \frac{q_t'\left( k' \right)}
          *             {\left| N\left( t' \right ) \right|},
-         *      \qquad N\left( t \right) = \left\{ t' \;\middle|\; tt' \in \tau \right\}.
+         *      \qquad tt' \in \tau,
+         *      \qquad N\left( t \right)
+         *      = \left\{ t' \;\middle|\; tt' \in \tau \right\}.
          * \f]
          */
         double penalty(const DisparityNode& nodeA,
@@ -180,7 +192,7 @@ template<typename Color> class DisparityGraph {
          *
          * \f[
          *  \left| t_x - t'_x \right| + \left| t_y - t'_y \right| \neq 1
-         *      \Rightarrow g_{tt'}\left( k, k' \right) = \infty.
+         *      \Rightarrow tt' \notin \tau.
          * \f]
          *
          * If a pixel of the right image
@@ -191,9 +203,9 @@ template<typename Color> class DisparityGraph {
          *
          * \f{eqnarray*}{
          *  t_x < t'_x,\; t_x + k > t'_x + k'
-         *      \Rightarrow g_{tt'}\left( k, k' \right) = \infty, \\
+         *      \Rightarrow tt' \notin \tau, \\
          *  t_x > t'_x,\; t_x + k < t'_x + k'
-         *      \Rightarrow g_{tt'}\left( k, k' \right) = \infty.
+         *      \Rightarrow tt' \notin \tau.
          * \f}
          */
         bool edgeExists(const DisparityNode& nodeA,
