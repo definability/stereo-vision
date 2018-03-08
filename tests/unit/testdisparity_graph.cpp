@@ -12,25 +12,27 @@ TEST(DisparityGraphTest, CreateSuccessful) {
 
 TEST(DisparityGraphTest, NodesPenalty) {
     Matrix<unsigned char> left{10, 10}, right{10, 10};
-    right[0][1] = 3;
+    right[0][0] = 3;
     left[0][0] = 1;
     left[0][1] = 2;
     DisparityGraph<unsigned char> graph{left, right};
-    ASSERT_DOUBLE_EQ(graph.nodePenalty({0, 1, 0}), 1);
-    ASSERT_DOUBLE_EQ(graph.nodePenalty({0, 1, 1}), 4);
+    ASSERT_DOUBLE_EQ(graph.nodePenalty({0, 1, 0}), 4);
+    ASSERT_DOUBLE_EQ(graph.nodePenalty({0, 0, 1}), 1);
 }
 
 TEST(DisparityGraphTest, EdgesPenalty) {
     Matrix<unsigned char> left{10, 10}, right{10, 10};
     right[0][0] = 9;
+    right[0][1] = 8;
     left[0][0] = 4;
+    left[0][2] = 5;
     DisparityGraph<unsigned char> graph{left, right};
     ASSERT_DOUBLE_EQ(graph.nodePenalty(0, 0, 0), 25);
-    ASSERT_DOUBLE_EQ(graph.nodePenalty(0, 1, 1), 16);
+    ASSERT_DOUBLE_EQ(graph.nodePenalty(0, 1, 1), 9);
     ASSERT_DOUBLE_EQ(graph.penalty({0, 0, 0}, {0, 1, 1}),
-                     25. / 2 +  16. / 3 + 1);
+                     25. / 2 +  9. / 3 + 1);
     ASSERT_DOUBLE_EQ(graph.penalty({0, 1, 1}, {0, 0, 0}),
-                     25. / 2 +  16. / 3 + 1);
+                     25. / 2 +  9. / 3 + 1);
 
     ASSERT_DOUBLE_EQ(graph.penalty({0, 5, 2}, {0, 6, 3}), 1);
     ASSERT_DOUBLE_EQ(graph.penalty({0, 6, 3}, {0, 5, 2}), 1);
@@ -82,11 +84,11 @@ TEST(DisparityGraphTest, WrongDisparitiesInf) {
     Matrix<unsigned char> left{10, 10}, right{10, 10};
     DisparityGraph<unsigned char> graph{left, right};
 
-    ASSERT_DOUBLE_EQ(graph.penalty({0, 5, 2}, {0, 6, 4}),
+    ASSERT_DOUBLE_EQ(graph.penalty({0, 5, 3}, {0, 6, 1}),
                      numeric_limits<double>::infinity());
-    ASSERT_DOUBLE_EQ(graph.penalty({0, 6, 4}, {0, 5, 2}),
+    ASSERT_DOUBLE_EQ(graph.penalty({0, 6, 1}, {0, 5, 3}),
                      numeric_limits<double>::infinity());
 
-    ASSERT_FALSE(graph.edgeExists({0, 5, 2}, {0, 6, 4}));
-    ASSERT_FALSE(graph.edgeExists({0, 6, 4}, {0, 5, 2}));
+    ASSERT_FALSE(graph.edgeExists({0, 5, 3}, {0, 6, 1}));
+    ASSERT_FALSE(graph.edgeExists({0, 6, 1}, {0, 5, 3}));
 }
