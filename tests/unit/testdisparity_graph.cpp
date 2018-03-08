@@ -1,9 +1,5 @@
-#include <limits>
-
 #include "testdisparity_graph.hpp"
 #include "matrix.hpp"
-
-using std::numeric_limits;
 
 TEST(DisparityGraphTest, CreateSuccessful) {
     Matrix<unsigned char> left{10, 10}, right{10, 10};
@@ -39,56 +35,4 @@ TEST(DisparityGraphTest, EdgesPenalty) {
 
     ASSERT_TRUE(graph.edgeExists({0, 5, 2}, {0, 6, 3}));
     ASSERT_TRUE(graph.edgeExists({0, 6, 3}, {0, 5, 2}));
-}
-
-TEST(DisparityGraphTest, DiagonalInf) {
-    Matrix<unsigned char> left{10, 10}, right{10, 10};
-    DisparityGraph<unsigned char> graph{left, right};
-
-    ASSERT_DOUBLE_EQ(graph.penalty({1, 0}, {0, 1}),
-                     numeric_limits<double>::infinity());
-    ASSERT_DOUBLE_EQ(graph.penalty({0, 1}, {1, 0}),
-                     numeric_limits<double>::infinity());
-
-    ASSERT_FALSE(graph.edgeExists({1, 0}, {0, 1}));
-    ASSERT_FALSE(graph.edgeExists({0, 1}, {1, 0}));
-}
-
-TEST(DisparityGraphTest, FarHorizontalInf) {
-    Matrix<unsigned char> left{10, 10}, right{10, 10};
-    DisparityGraph<unsigned char> graph{left, right};
-
-    ASSERT_DOUBLE_EQ(graph.penalty({0, 0}, {0, 5}),
-                     numeric_limits<double>::infinity());
-    ASSERT_DOUBLE_EQ(graph.penalty({0, 5}, {0, 0}),
-                     numeric_limits<double>::infinity());
-
-    ASSERT_FALSE(graph.edgeExists({0, 0}, {0, 5}));
-    ASSERT_FALSE(graph.edgeExists({0, 5}, {0, 0}));
-}
-
-TEST(DisparityGraphTest, FarVerticalInf) {
-    Matrix<unsigned char> left{10, 10}, right{10, 10};
-    DisparityGraph<unsigned char> graph{left, right};
-
-    ASSERT_DOUBLE_EQ(graph.penalty({0, 0}, {5, 0}),
-                     numeric_limits<double>::infinity());
-    ASSERT_DOUBLE_EQ(graph.penalty({5, 0}, {0, 0}),
-                     numeric_limits<double>::infinity());
-
-    ASSERT_FALSE(graph.edgeExists({0, 0}, {5, 0}));
-    ASSERT_FALSE(graph.edgeExists({5, 0}, {0, 0}));
-}
-
-TEST(DisparityGraphTest, WrongDisparitiesInf) {
-    Matrix<unsigned char> left{10, 10}, right{10, 10};
-    DisparityGraph<unsigned char> graph{left, right};
-
-    ASSERT_DOUBLE_EQ(graph.penalty({0, 5, 3}, {0, 6, 1}),
-                     numeric_limits<double>::infinity());
-    ASSERT_DOUBLE_EQ(graph.penalty({0, 6, 1}, {0, 5, 3}),
-                     numeric_limits<double>::infinity());
-
-    ASSERT_FALSE(graph.edgeExists({0, 5, 3}, {0, 6, 1}));
-    ASSERT_FALSE(graph.edgeExists({0, 6, 1}, {0, 5, 3}));
 }
