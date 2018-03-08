@@ -44,10 +44,7 @@ template<typename Color> class DisparityGraph {
             } else if (node.column >= this->rightImage_.columns()) {
                 throw invalid_argument(
                     "Column should not be greater than the last one.");
-            } else if (node.column < node.disparity) {
-                throw invalid_argument(
-                    "Disparity should not lead to image overflow.");
-            } else if (node.column - node.disparity
+            } else if (node.column + node.disparity
                        >= this->leftImage_.columns()) {
                 throw invalid_argument(
                     "Disparity should not lead to image overflow.");
@@ -159,7 +156,7 @@ template<typename Color> class DisparityGraph {
                 swap(leftDisparity, rightDisparity);
             }
             if (rightColumn - leftColumn > 1
-                    || rightDisparity > leftDisparity + 1) {
+                    || rightDisparity + 1 < leftDisparity) {
                 return false;
             }
 
@@ -176,7 +173,7 @@ template<typename Color> class DisparityGraph {
             this->checkNode_(node);
             double difference = static_cast<double>(
                 this->rightImage_[node.row][node.column])
-                - this->leftImage_[node.row][node.column - node.disparity];
+                - this->leftImage_[node.row][node.column + node.disparity];
             return difference * difference;
         }
         double nodePenalty(size_t row, size_t column, size_t disparity) {
