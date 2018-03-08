@@ -16,8 +16,19 @@ using std::swap;
  * \brief An information that uniquely identifies a node like coordinates.
  */
 struct DisparityNode {
+    /**
+     * \brief Row on which the node located.
+     */
     size_t row;
+    /**
+     * \brief Column on which the node located.
+     */
     size_t column;
+    /**
+     * \brief Disparity is an offset
+     * between the pixel on a right image
+     * and corresponding one on a left image.
+     */
     size_t disparity;
 };
 
@@ -31,9 +42,14 @@ struct DisparityNode {
  */
 template<typename Color> class DisparityGraph {
     private:
+        /**
+         * \brief Matrix representing left image.
+         */
         Matrix<Color> leftImage_;
+        /**
+         * \brief Matrix representing right image.
+         */
         Matrix<Color> rightImage_;
-
         /**
          * \brief Check that the node exists in this graph.
          *
@@ -87,17 +103,39 @@ template<typename Color> class DisparityGraph {
                 + (node.column < this->rightImage_.columns());
         }
     public:
+        /**
+         * \brief Copy graph in default way.
+         */
         DisparityGraph(const DisparityGraph& graph) = default;
+        /**
+         * \brief Move graph in default way.
+         */
         DisparityGraph(DisparityGraph&& graph) = default;
+        /**
+         * \brief A disparity graph needs two images --- left and right one.
+         *
+         * Input images should be made by equal cameras
+         * that look at the same direction
+         * (normal vectors to planes of their films should be equal)
+         * differing only by horizontal offset
+         * (\f$x\f$ coordinate, a column number).
+         * That's why each row of one image corresponds to the same row
+         * of another image and number of rows should be equal.
+         * Number of columns is not checked,
+         * so images could be trimmed if it's needed.
+         */
         DisparityGraph(const Matrix<Color>& leftImage,
                        const Matrix<Color>& rightImage)
                 : leftImage_{leftImage}
                 , rightImage_{rightImage} {
-            if (leftImage.columns() != rightImage.columns()) {
+            if (leftImage.rows() != rightImage.rows()) {
                 throw invalid_argument(
-                    "Images should have the same number of columns.");
+                    "Images should have the same number of rows.");
             }
         }
+        /**
+         * \brief Just destroy the graph and its copies of images.
+         */
         ~DisparityGraph() = default;
         /**
          * \brief Calculate a penalty of the edge between two given nodes.
@@ -108,7 +146,17 @@ template<typename Color> class DisparityGraph {
          *
          * Otherwise, the penalty is a sum of
          * squared difference of disparities
-         * and penalties of nodes divided by number of their neighbors.
+         * and penalties of nodes divided by number of their neighbors
+         *
+         * \f[
+         *  g_{tt'}\left( k, k' \right )
+         *      = \left( k - k' \right)^2
+         *      + \frac{q_t\left( k \right)}
+         *             {\left| N\left( t \right ) \right|}
+         *      + \frac{q_t'\left( k' \right)}
+         *             {\left| N\left( t' \right ) \right|},
+         *      \qquad N\left( t \right) = \left\{ t' \;\middle|\; tt' \in \tau \right\}.
+         * \f]
          */
         double penalty(const DisparityNode& nodeA,
                        const DisparityNode& nodeB) {
@@ -128,13 +176,25 @@ template<typename Color> class DisparityGraph {
          *
          * Only nearest pixels may be connected.
          * This means, that two nodes should differ
-         * eigher by column or by row, no both at the same time.
+         * eigher by column or by row, no both at the same time
+         *
+         * \f[
+         *  \left| t_x - t'_x \right| + \left| t_y - t'_y \right| \neq 1
+         *      \Rightarrow g_{tt'}\left( k, k' \right) = \infty.
+         * \f]
          *
          * If a pixel of the right image
          * is located to the right of its neighbor,
          * it can point to either the same pixel as its neighbor
          * or at the righter one --- it cannot correspond to a pixel
-         * that is to the left of corresponding pixel of its left neighbor.
+         * that is to the left of corresponding pixel of its left neighbor
+         *
+         * \f{eqnarray*}{
+         *  t_x < t'_x,\; t_x + k > t'_x + k'
+         *      \Rightarrow g_{tt'}\left( k, k' \right) = \infty, \\
+         *  t_x > t'_x,\; t_x + k < t'_x + k'
+         *      \Rightarrow g_{tt'}\left( k, k' \right) = \infty.
+         * \f}
          */
         bool edgeExists(const DisparityNode& nodeA,
                         const DisparityNode& nodeB) const {
@@ -173,7 +233,13 @@ template<typename Color> class DisparityGraph {
          *
          * The penalty is a Euclidian norm of a difference
          * between color of the pixel of the right image
-         * and corresponding imagge of the left image.
+         * and corresponding imagge of the left image
+         *
+         * \f[
+         *  q_t\left( k \right)
+         *  = \left\| \pmb{l}\left( t_x + k, t_y \right)
+         *          - \pmb{r}\left( t_x, t_y \right) \right\|^2.
+         * \f]
          */
         double nodePenalty(const DisparityNode& node) {
             this->checkNode_(node);
@@ -182,6 +248,9 @@ template<typename Color> class DisparityGraph {
                 - this->leftImage_[node.row][node.column + node.disparity];
             return difference * difference;
         }
+        /**
+         * @copydoc DisparityGraph::nodePenalty(const DisparityNode& node)
+         */
         double nodePenalty(size_t row, size_t column, size_t disparity) {
             return this->nodePenalty({row, column, disparity});
         }
