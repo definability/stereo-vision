@@ -13,6 +13,15 @@ using std::numeric_limits;
 using std::swap;
 
 /**
+ * \brief An information that uniquely identifies a node like coordinates.
+ */
+struct DisparityNode {
+    size_t row;
+    size_t column;
+    size_t disparity;
+};
+
+/**
  * \brief A graph that stores a pair of given images and possible disparities.
  * The graph consists of nodes, which correspond to pixels of the right image.
  * Labels of the nodes are disparities --- non-negative
@@ -22,12 +31,6 @@ using std::swap;
  */
 template<typename Color> class DisparityGraph {
     private:
-        struct Node {
-            size_t row;
-            size_t column;
-            size_t disparity;
-        };
-
         Matrix<Color> leftImage_;
         Matrix<Color> rightImage_;
 
@@ -37,7 +40,7 @@ template<typename Color> class DisparityGraph {
          * Node coordinates should not be out of the right image.
          * Disparity should not lead out of the left image.
          */
-        void checkNode_(const Node& node) const {
+        void checkNode_(const DisparityNode& node) const {
             if (node.row >= this->rightImage_.rows()) {
                 throw invalid_argument(
                     "Row should not be greater than the last one.");
@@ -58,7 +61,8 @@ template<typename Color> class DisparityGraph {
          *
          * A pixel cannot be a naighbor of itself.
          */
-        void checkEdge_(const Node& nodeA, const Node& nodeB) const {
+        void checkEdge_(const DisparityNode& nodeA,
+                        const DisparityNode& nodeB) const {
             if (nodeA.column == nodeB.column && nodeA.row == nodeB.row) {
                 throw invalid_argument(
                     "A pixel cannot be connected with itself.");
@@ -75,7 +79,7 @@ template<typename Color> class DisparityGraph {
          * If the pixel of located in a corder or on a border,
          * it obviously has less number of neighbors.
          */
-        size_t nodeNeighborsCount_(const Node& node) const {
+        size_t nodeNeighborsCount_(const DisparityNode& node) const {
             return
                 (node.row > 0)
                 + (node.row < this->rightImage_.rows())
@@ -106,7 +110,8 @@ template<typename Color> class DisparityGraph {
          * squared difference of disparities
          * and penalties of nodes divided by number of their neighbors.
          */
-        double penalty(const Node& nodeA, const Node& nodeB) {
+        double penalty(const DisparityNode& nodeA,
+                       const DisparityNode& nodeB) {
             if (!this->edgeExists(nodeA, nodeB)) {
                 return numeric_limits<double>::infinity();
             }
@@ -131,7 +136,8 @@ template<typename Color> class DisparityGraph {
          * or at the righter one --- it cannot correspond to a pixel
          * that is to the left of corresponding pixel of its left neighbor.
          */
-        bool edgeExists(const Node& nodeA, const Node& nodeB) const {
+        bool edgeExists(const DisparityNode& nodeA,
+                        const DisparityNode& nodeB) const {
             this->checkEdge_(nodeA, nodeB);
 
             if (nodeA.row != nodeB.row && nodeA.column != nodeB.column) {
@@ -169,7 +175,7 @@ template<typename Color> class DisparityGraph {
          * between color of the pixel of the right image
          * and corresponding imagge of the left image.
          */
-        double nodePenalty(const Node& node) {
+        double nodePenalty(const DisparityNode& node) {
             this->checkNode_(node);
             double difference = static_cast<double>(
                 this->rightImage_[node.row][node.column])
