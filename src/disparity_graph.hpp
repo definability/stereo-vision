@@ -117,12 +117,13 @@ template<typename Color> class DisparityGraph {
          * If the pixel of located in a corder or on a border,
          * it obviously has less number of neighbors.
          */
-        size_t nodeNeighborsCount_(const DisparityNode& node) const {
+        size_t nodeNeighborsCount_(const DisparityNode& node,
+                                   bool directed = false) const {
             return
-                (node.row > 0)
-                + (node.row < this->rightImage_.rows())
-                + (node.column > 0)
-                + (node.column < this->rightImage_.columns());
+                (node.row > 0 && !directed)
+                + (node.row < this->rightImage_.rows() - 1)
+                + (node.column > 0 && !directed)
+                + (node.column < this->rightImage_.columns() - 1);
         }
     public:
         /**
