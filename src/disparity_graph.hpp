@@ -156,7 +156,14 @@ template<typename Color> class DisparityGraph {
                 throw invalid_argument(
                     "Images should have the same number of rows.");
             }
+            if (leftImage.columns() < rightImage.columns()) {
+                throw invalid_argument(
+                    "Left image should have at least as much columns "
+                    "as the right one.");
+            }
             if (consistency_ < 0) {
+                throw invalid_argument(
+                    "Consistency term cannot be lower than 0.");
             }
         }
         /**
