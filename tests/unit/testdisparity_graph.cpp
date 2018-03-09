@@ -57,3 +57,12 @@ TEST(DisparityGraphTest, ConsistencyAffectsWeight) {
     ASSERT_TRUE(graph.edgeExists({0, 5, 2}, {0, 6, 3}));
     ASSERT_TRUE(graph.edgeExists({0, 6, 3}, {0, 5, 2}));
 }
+
+TEST(DisparityGraphTest, GetAllNodes) {
+    Matrix<unsigned char> left{10, 10}, right{10, 10};
+    DisparityGraph graph{left, right};
+    for (auto item: graph.availableNodes()) {
+        ASSERT_EQ(item.disparity, 0);
+    }
+    ASSERT_EQ(graph.availableNodes().size(), 100);
+}
