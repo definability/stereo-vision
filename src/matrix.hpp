@@ -20,8 +20,17 @@ template<typename T> class Matrix {
         size_t columns_;
         vector<vector<T> > data_;
     public:
+        /**
+         * \brief Copy matrix in default way.
+         */
         Matrix(const Matrix& matrix) = default;
+        /**
+         * \brief Move matrix in default way.
+         */
         Matrix(Matrix&& matrix) = default;
+        /**
+         * \brief Create a matrix with specified number of rows and columns.
+         */
         Matrix(size_t rows, size_t columns)
                 : rows_{rows}
                 , columns_{columns}
@@ -30,16 +39,22 @@ template<typename T> class Matrix {
                 row = vector<T>(columns);
             }
         }
+        /**
+         * \brief Just destroy the matrix and its data_ vector.
+         */
         ~Matrix() = default;
-
+        /**
+         * \brief Get number of columns.
+         */
         size_t columns() const {
             return this->columns_;
         }
-
+        /**
+         * \brief Get number of rows.
+         */
         size_t rows() const {
             return this->rows_;
         }
-
         /**
          * \brief An ability to read and write colors in particular pixels.
          *
