@@ -264,6 +264,49 @@ template<typename Color> class DisparityGraph {
             return result;
         }
         /**
+         * \brief Get available disparities of the neighbor of given node.
+         */
+        vector<size_t> neighborDisparities(
+                const DisparityNode& node, DisparityNode neighbor)
+                const {
+            vector<size_t> result;
+            size_t columns = this->rightImage_.columns();
+            neighbor.disparity = 0;
+
+            this->checkNode_(node);
+            this->checkNode_(neighbor);
+
+            if (node.row != neighbor.row
+                    && !this->edgeExists(node, neighbor)) {
+                return result;
+            } else if (node.row != neighbor.row) {
+                for (size_t disparity = 0;
+                        neighbor.column + disparity < columns; ++disparity) {
+                    result.push_back(disparity);
+                }
+                return result;
+            } else if (node.row == neighbor.row
+                    && node.column == neighbor.column + 1) {
+                for (size_t disparity = 0; disparity <= node.disparity + 1;
+                        ++disparity) {
+                    result.push_back(disparity);
+                }
+                return result;
+            } else if (node.row == neighbor.row
+                    && node.column + 1 == neighbor.column) {
+                for (size_t disparity = neighbor.disparity
+                            ? neighbor.disparity - 1
+                            : 0;
+                        neighbor.column + disparity < columns;
+                        ++disparity) {
+                    result.push_back(disparity);
+                }
+                return result;
+            } else {
+                return result;
+            }
+        }
+        /**
          * \brief Check that given nodes are connected by an edge
          * in the graph.
          *
