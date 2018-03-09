@@ -239,6 +239,7 @@ template<typename Color> class DisparityGraph {
          */
         vector<DisparityNode> nodeNeighbors(const DisparityNode& node,
                                             bool directed = false) const {
+            this->checkNode_(node);
             vector<DisparityNode> result;
 
             if (node.column < this->rightImage_.columns() - 1) {
