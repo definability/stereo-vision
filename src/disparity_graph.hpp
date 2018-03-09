@@ -270,10 +270,10 @@ template<typename Color> class DisparityGraph {
 
             size_t topRow = nodeA.row;
             size_t bottomRow = nodeB.row;
-            if (topRow < bottomRow) {
+            if (topRow > bottomRow) {
                 swap(topRow, bottomRow);
             }
-            if (bottomRow - topRow > 1) {
+            if (topRow + 1 < bottomRow) {
                 return false;
             }
 
@@ -285,7 +285,7 @@ template<typename Color> class DisparityGraph {
                 swap(leftColumn, rightColumn);
                 swap(leftDisparity, rightDisparity);
             }
-            if (rightColumn - leftColumn > 1
+            if (leftColumn + 1 < rightColumn
                     || rightDisparity + 1 < leftDisparity) {
                 return false;
             }
