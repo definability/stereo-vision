@@ -5,12 +5,14 @@
 #include <limits>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 
 #include "matrix.hpp"
 
 using std::invalid_argument;
 using std::numeric_limits;
 using std::swap;
+using std::vector;
 
 /**
  * \brief An information that uniquely identifies a node like coordinates.
@@ -199,6 +201,23 @@ template<typename Color> class DisparityGraph {
             double neighboringPenalty = (nodeA.disparity - nodeB.disparity)
                                       * (nodeA.disparity - nodeB.disparity);
             return nodesPenalty + this->consistency_ * neighboringPenalty;
+        }
+        /**
+         * \brief Get all available nodes with zero disparities.
+         *
+         * Zero disparities cannot conflict with each other,
+         * so this may be a good start for an optimization procedure
+         */
+        vector<DisparityNode> availableNodes() const {
+            vector<DisparityNode> result(
+                this->rightImage_.rows() * this->rightImage_.columns());
+
+            for (size_t y = 0; y < this->rightImage_.rows(); ++y) {
+                for (size_t x = 0; x < this->rightImage_.columns(); ++x) {
+                    result[y * this->rightImage_.columns() + x] = {x, y};
+                }
+            }
+            return result;
         }
         /**
          * \brief Check that given nodes are connected by an edge
