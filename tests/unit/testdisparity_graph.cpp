@@ -57,3 +57,92 @@ TEST(DisparityGraphTest, ConsistencyAffectsWeight) {
     ASSERT_TRUE(graph.edgeExists({0, 5, 2}, {0, 6, 3}));
     ASSERT_TRUE(graph.edgeExists({0, 6, 3}, {0, 5, 2}));
 }
+
+TEST(DisparityGraphTest, GetAllNodes) {
+    Matrix<unsigned char> left{10, 10}, right{10, 10};
+    DisparityGraph<unsigned char> graph{left, right};
+    for (auto item: graph.availableNodes()) {
+        ASSERT_EQ(item.disparity, 0);
+    }
+    ASSERT_EQ(graph.availableNodes().size(), 100);
+}
+
+TEST(DisparityGraphTest, GetNodeNeighbors) {
+    Matrix<unsigned char> left{10, 10}, right{10, 10};
+    DisparityGraph<unsigned char> graph{left, right};
+
+    vector<DisparityNode> neighbors;
+
+    neighbors = graph.nodeNeighbors({0, 0}, false);
+
+    ASSERT_EQ(neighbors.size(), 2);
+    ASSERT_EQ(neighbors[0].row, 0);
+    ASSERT_EQ(neighbors[0].column, 1);
+    ASSERT_EQ(neighbors[1].row, 1);
+    ASSERT_EQ(neighbors[1].column, 0);
+    for (auto neighbor : neighbors) {
+        ASSERT_TRUE(graph.edgeExists({0, 0}, neighbor));
+    }
+
+    neighbors = graph.nodeNeighbors({5, 6}, true);
+
+    ASSERT_EQ(neighbors.size(), 2);
+    ASSERT_EQ(neighbors[0].row, 5);
+    ASSERT_EQ(neighbors[0].column, 7);
+    ASSERT_EQ(neighbors[1].row, 6);
+    ASSERT_EQ(neighbors[1].column, 6);
+    for (auto neighbor : neighbors) {
+        ASSERT_TRUE(graph.edgeExists({5, 6}, neighbor));
+    }
+
+    ASSERT_EQ(graph.nodeNeighbors({9, 9}, true).size(), 0);
+}
+
+TEST(DisparityGraphTest, VisitAllNodesFromStart) {
+    Matrix<bool> left{5, 5}, right{5, 5};
+    DisparityGraph<bool> graph{left, right};
+
+    vector<DisparityNode> nodes = {{0, 0}};
+
+    while (!nodes.empty()) {
+        for (auto neighbor : graph.nodeNeighbors(nodes[0], true)) {
+            nodes.push_back(neighbor);
+        }
+        left[nodes[0].row][nodes[0].column] = true;
+        nodes.erase(nodes.begin());
+    }
+    for (size_t row = 0; row < left.rows(); ++row) {
+        for (size_t column = 0; column < left.columns(); ++column) {
+            ASSERT_TRUE(left[row][column]);
+        }
+    }
+}
+
+TEST(DisparityGraphTest, GetNeighborsDisparities) {
+    Matrix<unsigned char> left{10, 10}, right{10, 10};
+    DisparityGraph<unsigned char> graph{left, right};
+
+    vector<DisparityNode> neighbors;
+
+    for (auto neighbor : graph.nodeNeighbors({0, 0})) {
+        for (size_t disparity : graph.neighborDisparities({0, 0}, neighbor)) {
+            ASSERT_TRUE(
+                graph.edgeExists(
+                    {0, 0}, {neighbor.row, neighbor.column, disparity}));
+        }
+    }
+    for (auto neighbor : graph.nodeNeighbors({5, 6}, true)) {
+        for (size_t disparity : graph.neighborDisparities({0, 0}, neighbor)) {
+            ASSERT_TRUE(
+                graph.edgeExists(
+                    {0, 0}, {neighbor.row, neighbor.column, disparity}));
+        }
+    }
+    for (auto neighbor : graph.nodeNeighbors({9, 9}, true)) {
+        for (size_t disparity : graph.neighborDisparities({0, 0}, neighbor)) {
+            ASSERT_TRUE(
+                graph.edgeExists(
+                    {0, 0}, {neighbor.row, neighbor.column, disparity}));
+        }
+    }
+}

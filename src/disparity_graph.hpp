@@ -5,12 +5,14 @@
 #include <limits>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 
 #include "matrix.hpp"
 
 using std::invalid_argument;
 using std::numeric_limits;
 using std::swap;
+using std::vector;
 
 /**
  * \brief An information that uniquely identifies a node like coordinates.
@@ -115,12 +117,13 @@ template<typename Color> class DisparityGraph {
          * If the pixel of located in a corder or on a border,
          * it obviously has less number of neighbors.
          */
-        size_t nodeNeighborsCount_(const DisparityNode& node) const {
+        size_t nodeNeighborsCount_(const DisparityNode& node,
+                                   bool directed = false) const {
             return
-                (node.row > 0)
-                + (node.row < this->rightImage_.rows())
-                + (node.column > 0)
-                + (node.column < this->rightImage_.columns());
+                (node.row > 0 && !directed)
+                + (node.row < this->rightImage_.rows() - 1)
+                + (node.column > 0 && !directed)
+                + (node.column < this->rightImage_.columns() - 1);
         }
     public:
         /**
@@ -150,11 +153,22 @@ template<typename Color> class DisparityGraph {
                 : leftImage_{leftImage}
                 , rightImage_{rightImage}
                 , consistency_{consistency} {
+            if (!rightImage.rows() || !rightImage.columns()) {
+                throw invalid_argument(
+                    "Images should contain at least one pixel.");
+            }
             if (leftImage.rows() != rightImage.rows()) {
                 throw invalid_argument(
                     "Images should have the same number of rows.");
             }
+            if (leftImage.columns() < rightImage.columns()) {
+                throw invalid_argument(
+                    "Left image should have at least as much columns "
+                    "as the right one.");
+            }
             if (consistency_ < 0) {
+                throw invalid_argument(
+                    "Consistency term cannot be lower than 0.");
             }
         }
         /**
@@ -201,6 +215,99 @@ template<typename Color> class DisparityGraph {
             return nodesPenalty + this->consistency_ * neighboringPenalty;
         }
         /**
+         * \brief Get all available nodes with zero disparities.
+         *
+         * Zero disparities cannot conflict with each other,
+         * so this may be a good start for an optimization procedure
+         */
+        vector<DisparityNode> availableNodes() const {
+            vector<DisparityNode> result(
+                this->rightImage_.rows() * this->rightImage_.columns());
+
+            size_t rows = this->rightImage_.rows();
+            size_t columns = this->rightImage_.columns();
+
+            for (size_t row = 0; row < rows; ++row) {
+                for (size_t column = 0; column < columns; ++column) {
+                    result[row * columns + column] = {row, column};
+                }
+            }
+            return result;
+        }
+        /**
+         * \brief Get neighbor nodes with zero disparities.
+         */
+        vector<DisparityNode> nodeNeighbors(const DisparityNode& node,
+                                            bool directed = false) const {
+            this->checkNode_(node);
+            vector<DisparityNode> result;
+
+            if (node.column < this->rightImage_.columns() - 1) {
+                result.push_back({node.row, node.column + 1});
+            }
+            if (node.row < this->rightImage_.rows() - 1) {
+                result.push_back({node.row + 1, node.column});
+            }
+
+            if (directed) {
+                assert(result.size() == this->nodeNeighborsCount_(node, true));
+                return result;
+            }
+
+            if (node.column > 0) {
+                result.push_back({node.row, node.column - 1});
+            }
+            if (node.row > 0) {
+                result.push_back({node.row - 1, node.column});
+            }
+
+            assert(result.size() == this->nodeNeighborsCount_(node));
+            return result;
+        }
+        /**
+         * \brief Get available disparities of the neighbor of given node.
+         */
+        vector<size_t> neighborDisparities(
+                const DisparityNode& node, DisparityNode neighbor)
+                const {
+            vector<size_t> result;
+            size_t columns = this->rightImage_.columns();
+            neighbor.disparity = 0;
+
+            this->checkNode_(node);
+            this->checkNode_(neighbor);
+
+            if (node.row != neighbor.row
+                    && !this->edgeExists(node, neighbor)) {
+                return result;
+            } else if (node.row != neighbor.row) {
+                for (size_t disparity = 0;
+                        neighbor.column + disparity < columns; ++disparity) {
+                    result.push_back(disparity);
+                }
+                return result;
+            } else if (node.row == neighbor.row
+                    && node.column == neighbor.column + 1) {
+                for (size_t disparity = 0; disparity <= node.disparity + 1;
+                        ++disparity) {
+                    result.push_back(disparity);
+                }
+                return result;
+            } else if (node.row == neighbor.row
+                    && node.column + 1 == neighbor.column) {
+                for (size_t disparity = neighbor.disparity
+                            ? neighbor.disparity - 1
+                            : 0;
+                        neighbor.column + disparity < columns;
+                        ++disparity) {
+                    result.push_back(disparity);
+                }
+                return result;
+            } else {
+                return result;
+            }
+        }
+        /**
          * \brief Check that given nodes are connected by an edge
          * in the graph.
          *
@@ -236,10 +343,10 @@ template<typename Color> class DisparityGraph {
 
             size_t topRow = nodeA.row;
             size_t bottomRow = nodeB.row;
-            if (topRow < bottomRow) {
+            if (topRow > bottomRow) {
                 swap(topRow, bottomRow);
             }
-            if (bottomRow - topRow > 1) {
+            if (topRow + 1 < bottomRow) {
                 return false;
             }
 
@@ -251,7 +358,7 @@ template<typename Color> class DisparityGraph {
                 swap(leftColumn, rightColumn);
                 swap(leftDisparity, rightDisparity);
             }
-            if (rightColumn - leftColumn > 1
+            if (leftColumn + 1 < rightColumn
                     || rightDisparity + 1 < leftDisparity) {
                 return false;
             }
