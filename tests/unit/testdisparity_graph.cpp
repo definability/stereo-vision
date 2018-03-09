@@ -60,7 +60,7 @@ TEST(DisparityGraphTest, ConsistencyAffectsWeight) {
 
 TEST(DisparityGraphTest, GetAllNodes) {
     Matrix<unsigned char> left{10, 10}, right{10, 10};
-    DisparityGraph graph{left, right};
+    DisparityGraph<unsigned char> graph{left, right};
     for (auto item: graph.availableNodes()) {
         ASSERT_EQ(item.disparity, 0);
     }
@@ -69,7 +69,7 @@ TEST(DisparityGraphTest, GetAllNodes) {
 
 TEST(DisparityGraphTest, GetNodeNeighbors) {
     Matrix<unsigned char> left{10, 10}, right{10, 10};
-    DisparityGraph graph{left, right};
+    DisparityGraph<unsigned char> graph{left, right};
 
     vector<DisparityNode> neighbors;
 
@@ -100,7 +100,7 @@ TEST(DisparityGraphTest, GetNodeNeighbors) {
 
 TEST(DisparityGraphTest, VisitAllNodesFromStart) {
     Matrix<bool> left{5, 5}, right{5, 5};
-    DisparityGraph graph{left, right};
+    DisparityGraph<bool> graph{left, right};
 
     vector<DisparityNode> nodes = {{0, 0}};
 
@@ -120,7 +120,7 @@ TEST(DisparityGraphTest, VisitAllNodesFromStart) {
 
 TEST(DisparityGraphTest, GetNeighborsDisparities) {
     Matrix<unsigned char> left{10, 10}, right{10, 10};
-    DisparityGraph graph{left, right};
+    DisparityGraph<unsigned char> graph{left, right};
 
     vector<DisparityNode> neighbors;
 
