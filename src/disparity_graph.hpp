@@ -224,9 +224,12 @@ template<typename Color> class DisparityGraph {
             vector<DisparityNode> result(
                 this->rightImage_.rows() * this->rightImage_.columns());
 
-            for (size_t y = 0; y < this->rightImage_.rows(); ++y) {
-                for (size_t x = 0; x < this->rightImage_.columns(); ++x) {
-                    result[y * this->rightImage_.columns() + x] = {x, y};
+            size_t rows = this->rightImage_.rows();
+            size_t columns = this->rightImage_.columns();
+
+            for (size_t row = 0; row < rows; ++row) {
+                for (size_t column = 0; column < columns; ++column) {
+                    result[row * columns + column] = {row, column};
                 }
             }
             return result;
