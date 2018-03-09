@@ -16,8 +16,17 @@ using std::invalid_argument;
  */
 template<typename T> class Matrix {
     private:
+        /**
+         * \brief Number of rows of the matrix.
+         */
         size_t rows_;
+        /**
+         * \brief Number of columns of the matrix.
+         */
         size_t columns_;
+        /**
+         * \brief Storage of matrix elements.
+         */
         vector<vector<T> > data_;
     public:
         /**
@@ -40,7 +49,7 @@ template<typename T> class Matrix {
             }
         }
         /**
-         * \brief Just destroy the matrix and its data_ vector.
+         * \brief Just destroy the matrix and its attributes.
          */
         ~Matrix() = default;
         /**
