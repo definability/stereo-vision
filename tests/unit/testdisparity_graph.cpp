@@ -36,3 +36,24 @@ TEST(DisparityGraphTest, EdgesPenalty) {
     ASSERT_TRUE(graph.edgeExists({0, 5, 2}, {0, 6, 3}));
     ASSERT_TRUE(graph.edgeExists({0, 6, 3}, {0, 5, 2}));
 }
+
+TEST(DisparityGraphTest, ConsistencyAffectsWeight) {
+    Matrix<unsigned char> left{10, 10}, right{10, 10};
+    right[0][0] = 9;
+    right[0][1] = 8;
+    left[0][0] = 4;
+    left[0][2] = 5;
+    DisparityGraph<unsigned char> graph{left, right, 10};
+    ASSERT_DOUBLE_EQ(graph.nodePenalty(0, 0, 0), 25);
+    ASSERT_DOUBLE_EQ(graph.nodePenalty(0, 1, 1), 9);
+    ASSERT_DOUBLE_EQ(graph.penalty({0, 0, 0}, {0, 1, 1}),
+                     25. / 2 +  9. / 3 + 10 * 1);
+    ASSERT_DOUBLE_EQ(graph.penalty({0, 1, 1}, {0, 0, 0}),
+                     25. / 2 +  9. / 3 + 10 * 1);
+
+    ASSERT_DOUBLE_EQ(graph.penalty({0, 5, 2}, {0, 6, 3}), 10);
+    ASSERT_DOUBLE_EQ(graph.penalty({0, 6, 3}, {0, 5, 2}), 10);
+
+    ASSERT_TRUE(graph.edgeExists({0, 5, 2}, {0, 6, 3}));
+    ASSERT_TRUE(graph.edgeExists({0, 6, 3}, {0, 5, 2}));
+}
