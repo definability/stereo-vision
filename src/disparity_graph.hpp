@@ -153,6 +153,10 @@ template<typename Color> class DisparityGraph {
                 : leftImage_{leftImage}
                 , rightImage_{rightImage}
                 , consistency_{consistency} {
+            if (!rightImage.rows() || !rightImage.columns()) {
+                throw invalid_argument(
+                    "Images should contain at least one pixel.");
+            }
             if (leftImage.rows() != rightImage.rows()) {
                 throw invalid_argument(
                     "Images should have the same number of rows.");
