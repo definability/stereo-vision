@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning].
 
 - Basic project structure.
 - `Matrix` class to represent images.
+- Implement `DisparityGraph` class to store images
+  and calculate penalties for different labelings.
+- Implement `DisparityNode` to request and identify nodes of the graph.
 
 [Keep a Changelog]: http://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: http://semver.org/spec/v2.0.0.html
