@@ -19,13 +19,17 @@ struct DisparityNode {
     /**
      * \brief Row on which the node located.
      *
-     * Denoted in formulas as \f$t_x\f$.
+     * \f[
+     *  t_x \in \mathbb{N}_0.
+     * \f]
      */
     size_t row;
     /**
      * \brief Column on which the node located.
      *
-     * Denoted in formulas as \f$t_y\f$.
+     * \f[
+     *  t_y \in \mathbb{N}_0.
+     * \f]
      */
     size_t column;
     /**
@@ -33,7 +37,9 @@ struct DisparityNode {
      * between the pixel on a right image
      * and corresponding one on a left image.
      *
-     * Denoted in formulas as a label \f$k\f$.
+     * \f[
+     *  k \in \mathbb{N}_0.
+     * \f]
      */
     size_t disparity;
 };
@@ -56,6 +62,14 @@ template<typename Color> class DisparityGraph {
          * \brief Matrix representing right image.
          */
         Matrix<Color> rightImage_;
+        /**
+         * \brief Multiplier for edge penalty.
+         *
+         * \f[
+         *  \alpha \ge 0.
+         * \f]
+         */
+        double consistency_;
         /**
          * \brief Check that the node exists in this graph.
          *
@@ -131,12 +145,16 @@ template<typename Color> class DisparityGraph {
          * so images could be trimmed if it's needed.
          */
         DisparityGraph(const Matrix<Color>& leftImage,
-                       const Matrix<Color>& rightImage)
+                       const Matrix<Color>& rightImage,
+                       double consistency = 1)
                 : leftImage_{leftImage}
-                , rightImage_{rightImage} {
+                , rightImage_{rightImage}
+                , consistency_{consistency} {
             if (leftImage.rows() != rightImage.rows()) {
                 throw invalid_argument(
                     "Images should have the same number of rows.");
+            }
+            if (consistency_ < 0) {
             }
         }
         /**
@@ -160,7 +178,7 @@ template<typename Color> class DisparityGraph {
          *
          * \f[
          *  g_{tt'}\left( k, k' \right )
-         *      = \left( k - k' \right)^2
+         *      = \alpha \cdot \left( k - k' \right)^2
          *      + \frac{q_t\left( k \right)}
          *             {\left| N\left( t \right ) \right|}
          *      + \frac{q_t'\left( k' \right)}
@@ -180,7 +198,7 @@ template<typename Color> class DisparityGraph {
                 + this->nodePenalty(nodeB) / this->nodeNeighborsCount_(nodeB);
             double neighboringPenalty = (nodeA.disparity - nodeB.disparity)
                                       * (nodeA.disparity - nodeB.disparity);
-            return nodesPenalty + neighboringPenalty;
+            return nodesPenalty + this->consistency_ * neighboringPenalty;
         }
         /**
          * \brief Check that given nodes are connected by an edge
