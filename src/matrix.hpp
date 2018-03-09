@@ -2,11 +2,9 @@
 #define MATRIX_HPP
 
 #include <vector>
-#include <utility>
 #include <stdexcept>
 
 using std::vector;
-using std::move;
 using std::invalid_argument;
 
 /**
