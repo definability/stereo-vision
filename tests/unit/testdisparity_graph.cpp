@@ -66,3 +66,34 @@ TEST(DisparityGraphTest, GetAllNodes) {
     }
     ASSERT_EQ(graph.availableNodes().size(), 100);
 }
+
+TEST(DisparityGraphTest, GetNodeNeighbors) {
+    Matrix<unsigned char> left{10, 10}, right{10, 10};
+    DisparityGraph graph{left, right};
+
+    vector<DisparityNode> neighbors;
+
+    neighbors = graph.nodeNeighbors({0, 0}, false);
+
+    ASSERT_EQ(neighbors.size(), 2);
+    ASSERT_EQ(neighbors[0].row, 0);
+    ASSERT_EQ(neighbors[0].column, 1);
+    ASSERT_EQ(neighbors[1].row, 1);
+    ASSERT_EQ(neighbors[1].column, 0);
+    for (auto neighbor : neighbors) {
+        ASSERT_TRUE(graph.edgeExists({0, 0}, neighbor));
+    }
+
+    neighbors = graph.nodeNeighbors({5, 6}, true);
+
+    ASSERT_EQ(neighbors.size(), 2);
+    ASSERT_EQ(neighbors[0].row, 5);
+    ASSERT_EQ(neighbors[0].column, 7);
+    ASSERT_EQ(neighbors[1].row, 6);
+    ASSERT_EQ(neighbors[1].column, 6);
+    for (auto neighbor : neighbors) {
+        ASSERT_TRUE(graph.edgeExists({5, 6}, neighbor));
+    }
+
+    ASSERT_EQ(graph.nodeNeighbors({9, 9}, true).size(), 0);
+}
