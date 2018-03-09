@@ -97,3 +97,32 @@ TEST(DisparityGraphTest, GetNodeNeighbors) {
 
     ASSERT_EQ(graph.nodeNeighbors({9, 9}, true).size(), 0);
 }
+
+TEST(DisparityGraphTest, GetNeighborsDisparities) {
+    Matrix<unsigned char> left{10, 10}, right{10, 10};
+    DisparityGraph graph{left, right};
+
+    vector<DisparityNode> neighbors;
+
+    for (auto neighbor : graph.nodeNeighbors({0, 0})) {
+        for (size_t disparity : graph.neighborDisparities({0, 0}, neighbor)) {
+            ASSERT_TRUE(
+                graph.edgeExists(
+                    {0, 0}, {neighbor.row, neighbor.column, disparity}));
+        }
+    }
+    for (auto neighbor : graph.nodeNeighbors({5, 6}, true)) {
+        for (size_t disparity : graph.neighborDisparities({0, 0}, neighbor)) {
+            ASSERT_TRUE(
+                graph.edgeExists(
+                    {0, 0}, {neighbor.row, neighbor.column, disparity}));
+        }
+    }
+    for (auto neighbor : graph.nodeNeighbors({9, 9}, true)) {
+        for (size_t disparity : graph.neighborDisparities({0, 0}, neighbor)) {
+            ASSERT_TRUE(
+                graph.edgeExists(
+                    {0, 0}, {neighbor.row, neighbor.column, disparity}));
+        }
+    }
+}
