@@ -234,6 +234,32 @@ template<typename Color> class DisparityGraph {
             }
             return result;
         }
+        vector<DisparityNode> nodeNeighbors(const DisparityNode& node,
+                                            bool directed = false) const {
+            vector<DisparityNode> result;
+
+            if (node.column < this->rightImage_.columns() - 1) {
+                result.push_back({node.row, node.column + 1});
+            }
+            if (node.row < this->rightImage_.rows() - 1) {
+                result.push_back({node.row + 1, node.column});
+            }
+
+            if (directed) {
+                assert(result.size() == this->nodeNeighborsCount_(node, true));
+                return result;
+            }
+
+            if (node.column > 0) {
+                result.push_back({node.row, node.column - 1});
+            }
+            if (node.row > 0) {
+                result.push_back({node.row - 1, node.column});
+            }
+
+            assert(result.size() == this->nodeNeighborsCount_(node));
+            return result;
+        }
         /**
          * \brief Check that given nodes are connected by an edge
          * in the graph.
