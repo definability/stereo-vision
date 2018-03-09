@@ -98,6 +98,26 @@ TEST(DisparityGraphTest, GetNodeNeighbors) {
     ASSERT_EQ(graph.nodeNeighbors({9, 9}, true).size(), 0);
 }
 
+TEST(DisparityGraphTest, VisitAllNodesFromStart) {
+    Matrix<bool> left{5, 5}, right{5, 5};
+    DisparityGraph graph{left, right};
+
+    vector<DisparityNode> nodes = {{0, 0}};
+
+    while (!nodes.empty()) {
+        for (auto neighbor : graph.nodeNeighbors(nodes[0], true)) {
+            nodes.push_back(neighbor);
+        }
+        left[nodes[0].row][nodes[0].column] = true;
+        nodes.erase(nodes.begin());
+    }
+    for (size_t row = 0; row < left.rows(); ++row) {
+        for (size_t column = 0; column < left.columns(); ++column) {
+            ASSERT_TRUE(left[row][column]);
+        }
+    }
+}
+
 TEST(DisparityGraphTest, GetNeighborsDisparities) {
     Matrix<unsigned char> left{10, 10}, right{10, 10};
     DisparityGraph graph{left, right};
