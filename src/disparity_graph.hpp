@@ -234,6 +234,9 @@ template<typename Color> class DisparityGraph {
             }
             return result;
         }
+        /**
+         * \brief Get neighbor nodes with zero disparities.
+         */
         vector<DisparityNode> nodeNeighbors(const DisparityNode& node,
                                             bool directed = false) const {
             vector<DisparityNode> result;
