@@ -8,6 +8,7 @@ target_link_libraries(
 
     libdisparity-graph
     libmatrix
+    liblabeling
 
     libgtest
     libgmock
