@@ -391,6 +391,25 @@ template<typename Color> class DisparityGraph {
         double nodePenalty(size_t row, size_t column, size_t disparity) const {
             return this->nodePenalty({row, column, disparity});
         }
+        /**
+         * \brief Get number of columns of the right image.
+         *
+         * Number of columns of the right image
+         * is a number of horizontal nodes.
+         */
+        size_t columns() const {
+            return this->rightImage_.columns();
+        }
+        /**
+         * \brief Get number of rows of the right (and left) image.
+         *
+         * Number of rows of the right image
+         * is a number of vertical nodes
+         * and is equal to the number of rows of the left image.
+         */
+        size_t rows() const {
+            return this->rightImage_.rows();
+        }
 };
 
 #endif
