@@ -74,6 +74,16 @@ template<typename T> class Matrix {
         vector<T>& operator[](size_t index) {
             return this->data_[index];
         }
+        /**
+         * \brief An ability to read colors in particular pixels.
+         *
+         * Don't rely on a vector type of the output hardly.
+         * Use it only to read particular pixels,
+         * because behavior may change in future.
+         */
+        const vector<T>& operator[](size_t index) const {
+            return this->data_[index];
+        }
 };
 
 #endif
