@@ -73,25 +73,6 @@ template<typename Color> class DisparityGraph {
          */
         double consistency_;
         /**
-         * \brief Check that the node exists in this graph.
-         *
-         * Node coordinates should not be out of the right image.
-         * Disparity should not lead out of the left image.
-         */
-        void checkNode_(const DisparityNode& node) const {
-            if (node.row >= this->rightImage_.rows()) {
-                throw invalid_argument(
-                    "Row should not be greater than the last one.");
-            } else if (node.column >= this->rightImage_.columns()) {
-                throw invalid_argument(
-                    "Column should not be greater than the last one.");
-            } else if (node.column + node.disparity
-                       >= this->leftImage_.columns()) {
-                throw invalid_argument(
-                    "Disparity should not lead to image overflow.");
-            }
-        }
-        /**
          * \brief Check that given nodes may be connected by an edge
          * in the graph.
          *
@@ -105,8 +86,8 @@ template<typename Color> class DisparityGraph {
                 throw invalid_argument(
                     "A pixel cannot be connected with itself.");
             }
-            this->checkNode_(nodeA);
-            this->checkNode_(nodeB);
+            this->checkNode(nodeA);
+            this->checkNode(nodeB);
         }
         /**
          * \brief Calculate number of neighbor nodes of the given one.
@@ -203,7 +184,7 @@ template<typename Color> class DisparityGraph {
          * \f]
          */
         double penalty(const DisparityNode& nodeA,
-                       const DisparityNode& nodeB) {
+                       const DisparityNode& nodeB) const {
             if (!this->edgeExists(nodeA, nodeB)) {
                 return numeric_limits<double>::infinity();
             }
@@ -213,6 +194,25 @@ template<typename Color> class DisparityGraph {
             double neighboringPenalty = (nodeA.disparity - nodeB.disparity)
                                       * (nodeA.disparity - nodeB.disparity);
             return nodesPenalty + this->consistency_ * neighboringPenalty;
+        }
+        /**
+         * \brief Check that the node exists in this graph.
+         *
+         * Node coordinates should not be out of the right image.
+         * Disparity should not lead out of the left image.
+         */
+        void checkNode(const DisparityNode& node) const {
+            if (node.row >= this->rightImage_.rows()) {
+                throw invalid_argument(
+                    "Row should not be greater than the last one.");
+            } else if (node.column >= this->rightImage_.columns()) {
+                throw invalid_argument(
+                    "Column should not be greater than the last one.");
+            } else if (node.column + node.disparity
+                       >= this->leftImage_.columns()) {
+                throw invalid_argument(
+                    "Disparity should not lead to image overflow.");
+            }
         }
         /**
          * \brief Get all available nodes with zero disparities.
@@ -239,7 +239,7 @@ template<typename Color> class DisparityGraph {
          */
         vector<DisparityNode> nodeNeighbors(const DisparityNode& node,
                                             bool directed = false) const {
-            this->checkNode_(node);
+            this->checkNode(node);
             vector<DisparityNode> result;
 
             if (node.column < this->rightImage_.columns() - 1) {
@@ -274,8 +274,8 @@ template<typename Color> class DisparityGraph {
             size_t columns = this->rightImage_.columns();
             neighbor.disparity = 0;
 
-            this->checkNode_(node);
-            this->checkNode_(neighbor);
+            this->checkNode(node);
+            this->checkNode(neighbor);
 
             if (node.row != neighbor.row
                     && !this->edgeExists(node, neighbor)) {
@@ -378,8 +378,8 @@ template<typename Color> class DisparityGraph {
          *          - \pmb{r}\left( t_x, t_y \right) \right\|^2.
          * \f]
          */
-        double nodePenalty(const DisparityNode& node) {
-            this->checkNode_(node);
+        double nodePenalty(const DisparityNode& node) const {
+            this->checkNode(node);
             double difference = static_cast<double>(
                 this->rightImage_[node.row][node.column])
                 - this->leftImage_[node.row][node.column + node.disparity];
