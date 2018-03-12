@@ -388,7 +388,7 @@ template<typename Color> class DisparityGraph {
         /**
          * @copydoc DisparityGraph::nodePenalty(const DisparityNode& node)
          */
-        double nodePenalty(size_t row, size_t column, size_t disparity) {
+        double nodePenalty(size_t row, size_t column, size_t disparity) const {
             return this->nodePenalty({row, column, disparity});
         }
 };
