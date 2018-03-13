@@ -389,7 +389,7 @@ template<typename Color> class DisparityGraph {
             return difference * difference;
         }
         /**
-         * @copydoc DisparityGraph::nodePenalty(const DisparityNode& node)
+         * @copydoc DisparityGraph::nodePenalty
          */
         double nodePenalty(size_t row, size_t column, size_t disparity) const {
             return this->nodePenalty({row, column, disparity});
