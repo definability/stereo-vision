@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-#include "disparity_graph.hpp"
 
 class DisparityGraphTest : public ::testing::Test {
     protected:

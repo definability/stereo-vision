@@ -82,6 +82,10 @@ template<typename Color> class Labeling {
                 , nodes_{graph.availableNodes()} {
         }
         /**
+         * \brief Just destroy the labeling.
+         */
+        ~Labeling() = default;
+        /**
          * \brief Get available disparities for the node.
          */
         vector<size_t> nodeDisparities(const DisparityNode& node) {

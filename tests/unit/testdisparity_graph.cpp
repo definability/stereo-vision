@@ -1,4 +1,6 @@
 #include "testdisparity_graph.hpp"
+
+#include "disparity_graph.hpp"
 #include "matrix.hpp"
 
 TEST(DisparityGraphTest, CreateSuccessful) {
