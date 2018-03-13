@@ -2,17 +2,13 @@
 #define LABELING_HPP
 
 #include <algorithm>
-#include <iterator>
 #include <set>
 #include <vector>
 
 #include "disparity_graph.hpp"
 
-using std::back_inserter;
 using std::find;
-using std::merge;
 using std::multiset;
-using std::upper_bound;
 using std::vector;
 
 template<typename Color> class Labeling {
@@ -45,7 +41,7 @@ template<typename Color> class Labeling {
          * \brief Get neighbor nodes of the given one.
          */
         vector<DisparityNode> neighbors(
-                const DisparityNode& node, bool directed=false) const {
+                const DisparityNode& node, bool directed = false) const {
             vector<DisparityNode> neighbors = this->graph_.nodeNeighbors(
                 node, directed);
             vector<DisparityNode> result;
