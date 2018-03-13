@@ -348,6 +348,8 @@ template<typename Color> class DisparityGraph {
             }
             if (topRow + 1 < bottomRow) {
                 return false;
+            } else if (nodeA.column == nodeB.column) {
+                return true;
             }
 
             size_t leftColumn = nodeA.column;

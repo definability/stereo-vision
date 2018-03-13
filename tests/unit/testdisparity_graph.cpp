@@ -37,6 +37,13 @@ TEST(DisparityGraphTest, EdgesPenalty) {
     ASSERT_TRUE(graph.edgeExists({0, 6, 3}, {0, 5, 2}));
 }
 
+TEST(DisparityGraphTest, VerticalDisparityIndependence) {
+    Matrix<unsigned char> left{10, 10}, right{10, 10};
+    DisparityGraph<unsigned char> graph{left, right};
+    ASSERT_DOUBLE_EQ(graph.penalty({5, 5, 3}, {6, 5, 0}), 9);
+    ASSERT_TRUE(graph.edgeExists({5, 5, 3}, {6, 5, 0}));
+}
+
 TEST(DisparityGraphTest, ConsistencyAffectsWeight) {
     Matrix<unsigned char> left{10, 10}, right{10, 10};
     right[0][0] = 9;
@@ -96,6 +103,7 @@ TEST(DisparityGraphTest, GetNodeNeighbors) {
     }
 
     ASSERT_EQ(graph.nodeNeighbors({9, 9}, true).size(), 0);
+    ASSERT_EQ(graph.nodeNeighbors({9, 9}, false).size(), 2);
 }
 
 TEST(DisparityGraphTest, VisitAllNodesFromStart) {
