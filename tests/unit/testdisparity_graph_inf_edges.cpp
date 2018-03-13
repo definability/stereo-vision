@@ -2,6 +2,8 @@
 #include <tuple>
 
 #include "testdisparity_graph_inf_edges.hpp"
+
+#include "disparity_graph.hpp"
 #include "matrix.hpp"
 
 using std::numeric_limits;

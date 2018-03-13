@@ -1,5 +1,7 @@
 #include "testmatrix.hpp"
 
+#include "matrix.hpp"
+
 TEST(MatrixTest, CreateSuccessful) {
     Matrix<int> m{10, 20};
     ASSERT_EQ(m.rows(), 10u);
