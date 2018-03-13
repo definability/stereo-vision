@@ -107,14 +107,15 @@ template<typename Color> class DisparityGraph {
                 + (node.column < this->rightImage_.columns() - 1);
         }
     public:
+        DisparityGraph() = delete;
         /**
          * \brief Copy graph in default way.
          */
-        DisparityGraph(const DisparityGraph& graph) = default;
+        DisparityGraph(const DisparityGraph&) = default;
         /**
          * \brief Move graph in default way.
          */
-        DisparityGraph(DisparityGraph&& graph) = default;
+        DisparityGraph(DisparityGraph&&) = default;
         /**
          * \brief A disparity graph needs two images --- left and right one.
          *

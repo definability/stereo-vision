@@ -29,6 +29,7 @@ template<typename T> class Matrix {
          */
         vector<vector<T> > data_;
     public:
+        Matrix() = delete;
         /**
          * \brief Copy matrix in default way.
          */
