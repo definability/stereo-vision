@@ -45,25 +45,6 @@ template<typename Color> class Labeling {
             return this->nodes_.begin()
                 + node.row * this->graph_.columns() + node.column;
         }
-        /**
-         * \brief Get neighbor nodes of the given one.
-         */
-        vector<DisparityNode> neighbors(
-                const DisparityNode& node, bool directed = false) const {
-            vector<DisparityNode> neighbors = this->graph_.nodeNeighbors(
-                node, directed);
-            vector<DisparityNode> result;
-            result.reserve(neighbors.size());
-
-            for (DisparityNode neighbor : neighbors) {
-                vector<DisparityNode>::const_iterator it =
-                    this->nodeIterator_(neighbor);
-                assert((*it).row == neighbor.row);
-                assert((*it).column == neighbor.column);
-                result.push_back(*it);
-            }
-            return result;
-        }
     public:
         Labeling() = delete;
         /**
@@ -143,6 +124,51 @@ template<typename Color> class Labeling {
          */
         size_t disparity(const DisparityNode& node) const {
             return (*this->nodeIterator_(node)).disparity;
+        }
+        /**
+         * \brief Get neighbor nodes of the given one.
+         */
+        vector<DisparityNode> neighbors(
+                const DisparityNode& node, bool directed = false) const {
+            vector<DisparityNode> neighbors = this->graph_.nodeNeighbors(
+                node, directed);
+            vector<DisparityNode> result;
+            result.reserve(neighbors.size());
+
+            for (DisparityNode neighbor : neighbors) {
+                vector<DisparityNode>::const_iterator it =
+                    this->nodeIterator_(neighbor);
+                assert((*it).row == neighbor.row);
+                assert((*it).column == neighbor.column);
+                result.push_back(*it);
+            }
+            return result;
+        }
+        /**
+         * \brief Getter for constant references to nodes.
+         */
+        const vector<DisparityNode>& nodes() const {
+            return this->nodes_;
+        }
+        /**
+         * \brief Copy assignment operator.
+         *
+         * Needs to be implemented explicitly
+         * because of const reference to DisparityGraph.
+         *
+         * We cannot change the graph,
+         * so let it be an exception
+         * in the case when graph of another labeling
+         * is not the same.
+         */
+        Labeling& operator=(const Labeling& labeling) {
+            if (&(this->graph_) != &(labeling.graph_)) {
+                throw invalid_argument(
+                    "You can assign only the labeling "
+                    "with the same disparity graph.");
+            }
+            this->nodes_ = labeling.nodes_;
+            return *this;
         }
 };
 
