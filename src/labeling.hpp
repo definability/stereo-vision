@@ -13,6 +13,12 @@ using std::isinf;
 using std::multiset;
 using std::vector;
 
+/**
+ * \brief Labeling is a set of labeled pixels.
+ * Needed to store particular labeling,
+ * change it without making infinite penalty
+ * and calculate the penalty.
+ */
 template<typename Color> class Labeling {
     private:
         /**
