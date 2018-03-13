@@ -9,7 +9,7 @@
 #include "disparity_graph.hpp"
 
 using std::find;
-using std::isinf;
+using std::isfinite;
 using std::multiset;
 using std::vector;
 
@@ -119,7 +119,7 @@ template<typename Color> class Labeling {
                     result += this->graph_.penalty(node, neighbor);
                 }
             }
-            assert(!isinf(result));
+            assert(isfinite(result));
             return result;
         }
         /**
