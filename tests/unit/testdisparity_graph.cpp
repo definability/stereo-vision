@@ -156,3 +156,14 @@ TEST(DisparityGraphTest, GetNeighborsDisparities) {
         }
     }
 }
+
+TEST(DisparityGraphTest, GetNeighborDisparities) {
+    Matrix<unsigned char> left{10, 10}, right{10, 10};
+    DisparityGraph<unsigned char> graph{left, right};
+
+    vector<size_t> disparities = graph.neighborDisparities({4, 2, 2}, {4, 3});
+    ASSERT_EQ(disparities.size(), 6);
+    for (size_t i = 0; i < disparities.size(); ++i) {
+        disparities[i] = i + 1;
+    }
+}

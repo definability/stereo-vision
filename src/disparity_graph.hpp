@@ -284,6 +284,8 @@ template<typename Color> class DisparityGraph {
             } else if (node.row != neighbor.row) {
                 for (size_t disparity = 0;
                         neighbor.column + disparity < columns; ++disparity) {
+                    assert(this->edgeExists(
+                        node, {neighbor.row,  neighbor.column, disparity}));
                     result.push_back(disparity);
                 }
                 return result;
@@ -291,16 +293,20 @@ template<typename Color> class DisparityGraph {
                     && node.column == neighbor.column + 1) {
                 for (size_t disparity = 0; disparity <= node.disparity + 1;
                         ++disparity) {
+                    assert(this->edgeExists(
+                        node, {neighbor.row,  neighbor.column, disparity}));
                     result.push_back(disparity);
                 }
                 return result;
             } else if (node.row == neighbor.row
                     && node.column + 1 == neighbor.column) {
-                for (size_t disparity = neighbor.disparity
-                            ? neighbor.disparity - 1
-                            : 0;
+                for (size_t disparity = (node.disparity
+                            ? node.disparity - 1
+                            : 0);
                         neighbor.column + disparity < columns;
                         ++disparity) {
+                    assert(this->edgeExists(
+                        node, {neighbor.row,  neighbor.column, disparity}));
                     result.push_back(disparity);
                 }
                 return result;
