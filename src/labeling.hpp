@@ -2,12 +2,14 @@
 #define LABELING_HPP
 
 #include <algorithm>
+#include <cmath>
 #include <set>
 #include <vector>
 
 #include "disparity_graph.hpp"
 
 using std::find;
+using std::isinf;
 using std::multiset;
 using std::vector;
 
@@ -111,6 +113,7 @@ template<typename Color> class Labeling {
                     result += this->graph_.penalty(node, neighbor);
                 }
             }
+            assert(!isinf(result));
             return result;
         }
         /**
