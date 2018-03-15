@@ -58,7 +58,7 @@ template<typename Color> class Labeling {
         /**
          * \brief Initialize the labeling based on disparities graph.
          */
-        Labeling(const DisparityGraph<Color>& graph)
+        explicit Labeling(const DisparityGraph<Color>& graph)
                 : graph_{graph}
                 , nodes_{graph.availableNodes()} {
         }

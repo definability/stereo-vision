@@ -49,10 +49,10 @@ template <typename Color> class BFDisparityFinder {
     public:
         BFDisparityFinder() = delete;
         BFDisparityFinder(const BFDisparityFinder&) = default;
-        BFDisparityFinder(const DisparityGraph<Color>& disparity_graph)
-            : graph_{disparity_graph}
-            , labeling_{disparity_graph}
-            , bestLabeling_{disparity_graph} {
+        explicit BFDisparityFinder(const DisparityGraph<Color>& graph)
+            : graph_{graph}
+            , labeling_{graph}
+            , bestLabeling_{graph} {
         }
         Labeling<Color> find() {
             vector<DisparityNode> nodes{this->labeling_.nodes()};
