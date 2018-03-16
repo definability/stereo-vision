@@ -8,13 +8,15 @@
 
 using std::vector;
 
-TEST(LabelingTest, CreateSuccessful) {
+TEST(LabelingTest, CreateSuccessful)
+{
     Matrix<unsigned char> left{10, 10}, right{10, 10};
     DisparityGraph<unsigned char> graph{left, right};
     Labeling<unsigned char> labeling{graph};
 }
 
-TEST(LabelingTest, RightAvailableDisparities) {
+TEST(LabelingTest, RightAvailableDisparities)
+{
     Matrix<unsigned char> left{10, 10}, right{10, 10};
     DisparityGraph<unsigned char> graph{left, right};
     Labeling<unsigned char> labeling{graph};
@@ -31,7 +33,8 @@ TEST(LabelingTest, RightAvailableDisparities) {
     ASSERT_EQ(disparities[1], 1);
 }
 
-TEST(LabelingTest, SetNodeSuccess) {
+TEST(LabelingTest, SetNodeSuccess)
+{
     Matrix<unsigned char> left{10, 10}, right{10, 10};
     DisparityGraph<unsigned char> graph{left, right};
     Labeling<unsigned char> labeling{graph};
@@ -43,7 +46,8 @@ TEST(LabelingTest, SetNodeSuccess) {
     ASSERT_EQ(labeling.disparity({0, 0}), 0);
 }
 
-TEST(LabelingTest, SetNodesSuccess) {
+TEST(LabelingTest, SetNodesSuccess)
+{
     Matrix<unsigned char> left{10, 10}, right{10, 10};
     DisparityGraph<unsigned char> graph{left, right};
     Labeling<unsigned char> labeling{graph};
@@ -57,7 +61,8 @@ TEST(LabelingTest, SetNodesSuccess) {
     ASSERT_EQ(labeling.disparity({5, 3}), 3);
 }
 
-TEST(LabelingTest, PenaltyRight) {
+TEST(LabelingTest, PenaltyRight)
+{
     Matrix<unsigned char> left{10, 10}, right{10, 10};
     DisparityGraph<unsigned char> graph{left, right};
     Labeling<unsigned char> labeling{graph};

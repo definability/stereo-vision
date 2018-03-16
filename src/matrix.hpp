@@ -14,7 +14,8 @@ using std::invalid_argument;
  * contain RGB or RGBA color channels,
  * that's why a template parameter T is needed.
  */
-template<typename T> class Matrix {
+template<typename T> class Matrix
+{
     private:
         /**
          * \brief Number of rows of the matrix.
@@ -44,8 +45,10 @@ template<typename T> class Matrix {
         Matrix(size_t rows, size_t columns)
                 : rows_{rows}
                 , columns_{columns}
-                , data_{vector< vector<T> >(rows)} {
-            for (vector<T>& row : this->data_) {
+                , data_{vector< vector<T> >(rows)}
+        {
+            for (vector<T>& row : this->data_)
+            {
                 row = vector<T>(columns);
             }
         }
@@ -56,13 +59,15 @@ template<typename T> class Matrix {
         /**
          * \brief Get number of columns.
          */
-        size_t columns() const {
+        size_t columns() const
+        {
             return this->columns_;
         }
         /**
          * \brief Get number of rows.
          */
-        size_t rows() const {
+        size_t rows() const
+        {
             return this->rows_;
         }
         /**
@@ -72,7 +77,8 @@ template<typename T> class Matrix {
          * Use it only to read and write particular pixels,
          * because behavior may change in future.
          */
-        vector<T>& operator[](size_t index) {
+        vector<T>& operator[](size_t index)
+        {
             return this->data_[index];
         }
         /**
@@ -82,7 +88,8 @@ template<typename T> class Matrix {
          * Use it only to read particular pixels,
          * because behavior may change in future.
          */
-        const vector<T>& operator[](size_t index) const {
+        const vector<T>& operator[](size_t index) const
+        {
             return this->data_[index];
         }
 };

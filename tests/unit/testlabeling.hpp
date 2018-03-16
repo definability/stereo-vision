@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
-class LabelingTest : public ::testing::Test {
+class LabelingTest : public ::testing::Test
+{
     protected:
         LabelingTest() {};
         virtual ~LabelingTest() {};

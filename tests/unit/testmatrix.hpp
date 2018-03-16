@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
-class MatrixTest : public ::testing::Test {
+class MatrixTest : public ::testing::Test
+{
     protected:
         MatrixTest() {};
         virtual ~MatrixTest() {};

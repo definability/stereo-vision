@@ -6,9 +6,10 @@
 using std::tuple;
 
 class DisparityGraphInfiniteEdgesTest
-        : public ::testing::TestWithParam<
-              tuple<DisparityNode, DisparityNode>
-        > {
+    : public ::testing::TestWithParam<
+        tuple<DisparityNode, DisparityNode>
+      >
+{
     protected:
         DisparityGraphInfiniteEdgesTest() {};
         virtual ~DisparityGraphInfiniteEdgesTest() {};

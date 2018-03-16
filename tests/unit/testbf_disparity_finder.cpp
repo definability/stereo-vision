@@ -5,24 +5,28 @@
 #include "labeling.hpp"
 #include "matrix.hpp"
 
-TEST(BFDisparityFinderTest, CreateSuccessful) {
+TEST(BFDisparityFinderTest, CreateSuccessful)
+{
     Matrix<unsigned char> left{3, 3}, right{3, 3};
     DisparityGraph<unsigned char> graph{left, right};
     BFDisparityFinder<unsigned char> finder{graph};
 }
 
-TEST(BFDisparityFinderTest, FindBestTrivial) {
+TEST(BFDisparityFinderTest, FindBestTrivial)
+{
     Matrix<unsigned char> left{3, 3}, right{3, 3};
     DisparityGraph<unsigned char> graph{left, right};
     BFDisparityFinder<unsigned char> finder{graph};
     Labeling<unsigned char> labeling{finder.find()};
     ASSERT_DOUBLE_EQ(labeling.penalty(), 0);
-    for (DisparityNode node : labeling.nodes()) {
+    for (DisparityNode node : labeling.nodes())
+    {
         ASSERT_EQ(node.disparity, 0);
     }
 }
 
-TEST(BFDisparityFinderTest, FindBestDot) {
+TEST(BFDisparityFinderTest, FindBestDot)
+{
     Matrix<unsigned char> left{3, 3}, right{3, 3};
     left[1][1] = 0xFF;
     right[1][0] = 0xFF;
