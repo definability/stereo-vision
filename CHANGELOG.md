@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+### Added
+
+- `DisparityFinder` base class.
+
 ## 0.0.1 - 2017-03-16
 
 ### Added

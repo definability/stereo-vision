@@ -78,7 +78,7 @@ TEST(DisparityGraphTest, GetAllNodes)
     DisparityGraph<unsigned char> graph{left, right};
     for (auto item: graph.availableNodes())
     {
-        ASSERT_EQ(item.disparity, 0);
+        ASSERT_EQ(item.disparity, 0ul);
     }
     ASSERT_EQ(graph.availableNodes().size(), 100);
 }

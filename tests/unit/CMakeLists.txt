@@ -10,6 +10,7 @@ target_link_libraries(
     libmatrix
     liblabeling
     libbf_disparity_finder
+    libdisparity_finder
 
     libgtest
     libgmock
