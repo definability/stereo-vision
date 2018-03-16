@@ -1,9 +1,10 @@
-#ifndef BFDISPARITY_FINDER
-#define BFDISPARITY_FINDER
+#ifndef BF_DISPARITY_FINDER
+#define BF_DISPARITY_FINDER
 
 #include <limits>
 #include <vector>
 
+#include "disparity_finder.hpp"
 #include "disparity_graph.hpp"
 #include "labeling.hpp"
 
@@ -14,12 +15,9 @@ using std::vector;
  * \brief An entity that finds disparities using brute force.
  */
 template <typename Color> class BFDisparityFinder
+    : public DisparityFinder<Color>
 {
     private:
-        /**
-         * \brief A graph that represents the problem to solve.
-         */
-        const DisparityGraph<Color>& graph_;
         /**
          * \brief Find the best labeling.
          *
@@ -75,13 +73,17 @@ template <typename Color> class BFDisparityFinder
          * \brief Only a graph that describes the problem is needed.
          */
         explicit BFDisparityFinder(const DisparityGraph<Color>& graph)
-            : graph_{graph}
+            : DisparityFinder<Color>{graph}
         {
         }
         /**
+         * \brief Destructor is default.
+         */
+        virtual ~BFDisparityFinder() = default;
+        /**
          * \brief Find the best labeling using brute force.
          */
-        Labeling<Color> find()
+        virtual Labeling<Color> find()
         {
             Labeling<Color> labeling{this->graph_};
             Labeling<Color> bestLabeling{labeling};
