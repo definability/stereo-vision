@@ -3,8 +3,8 @@
 #include "testlabeling.hpp"
 
 #include "disparity_graph.hpp"
-#include "matrix.hpp"
 #include "labeling.hpp"
+#include "matrix.hpp"
 
 using std::vector;
 

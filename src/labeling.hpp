@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <set>
 #include <vector>
 
@@ -11,6 +12,7 @@
 using std::find;
 using std::isfinite;
 using std::multiset;
+using std::numeric_limits;
 using std::vector;
 
 /**
@@ -30,6 +32,10 @@ template<typename Color> class Labeling {
          */
         vector<DisparityNode> nodes_;
         /**
+         * \brief Cached value of the penalty.
+         */
+        double penalty_ = numeric_limits<double>::infinity();
+        /**
          * \brief Get constant iterator to the node;
          */
         vector<DisparityNode>::const_iterator nodeIterator_(
@@ -45,25 +51,6 @@ template<typename Color> class Labeling {
             return this->nodes_.begin()
                 + node.row * this->graph_.columns() + node.column;
         }
-        /**
-         * \brief Get neighbor nodes of the given one.
-         */
-        vector<DisparityNode> neighbors(
-                const DisparityNode& node, bool directed = false) const {
-            vector<DisparityNode> neighbors = this->graph_.nodeNeighbors(
-                node, directed);
-            vector<DisparityNode> result;
-            result.reserve(neighbors.size());
-
-            for (DisparityNode neighbor : neighbors) {
-                vector<DisparityNode>::const_iterator it =
-                    this->nodeIterator_(neighbor);
-                assert((*it).row == neighbor.row);
-                assert((*it).column == neighbor.column);
-                result.push_back(*it);
-            }
-            return result;
-        }
     public:
         Labeling() = delete;
         /**
@@ -77,7 +64,7 @@ template<typename Color> class Labeling {
         /**
          * \brief Initialize the labeling based on disparities graph.
          */
-        Labeling(const DisparityGraph<Color>& graph)
+        explicit Labeling(const DisparityGraph<Color>& graph)
                 : graph_{graph}
                 , nodes_{graph.availableNodes()} {
         }
@@ -117,14 +104,17 @@ template<typename Color> class Labeling {
          * \brief Calculate total penalty.
          */
         double penalty() {
-            double result = 0;
+            if (isfinite(this->penalty_)) {
+                return this->penalty_;
+            }
+            this->penalty_ = 0;
             for (DisparityNode node : this->nodes_) {
                 for (DisparityNode neighbor : this->neighbors(node, true)) {
-                    result += this->graph_.penalty(node, neighbor);
+                    this->penalty_ += this->graph_.penalty(node, neighbor);
                 }
             }
-            assert(isfinite(result));
-            return result;
+            assert(isfinite(this->penalty_));
+            return this->penalty_;
         }
         /**
          * \brief Change disparity of the node.
@@ -137,12 +127,59 @@ template<typename Color> class Labeling {
                 throw invalid_argument("Provided disparity is not available.");
             }
             *(this->nodeIterator_(node)) = node;
+            this->penalty_ = numeric_limits<double>::infinity();
         }
         /**
          * \brief Get disparity of the node.
          */
         size_t disparity(const DisparityNode& node) const {
             return (*this->nodeIterator_(node)).disparity;
+        }
+        /**
+         * \brief Get neighbor nodes of the given one.
+         */
+        vector<DisparityNode> neighbors(
+                const DisparityNode& node, bool directed = false) const {
+            vector<DisparityNode> neighbors = this->graph_.nodeNeighbors(
+                node, directed);
+            vector<DisparityNode> result;
+            result.reserve(neighbors.size());
+
+            for (DisparityNode neighbor : neighbors) {
+                vector<DisparityNode>::const_iterator it =
+                    this->nodeIterator_(neighbor);
+                assert((*it).row == neighbor.row);
+                assert((*it).column == neighbor.column);
+                result.push_back(*it);
+            }
+            return result;
+        }
+        /**
+         * \brief Getter for constant references to nodes.
+         */
+        const vector<DisparityNode>& nodes() const {
+            return this->nodes_;
+        }
+        /**
+         * \brief Copy assignment operator.
+         *
+         * Needs to be implemented explicitly
+         * because of const reference to DisparityGraph.
+         *
+         * We cannot change the graph,
+         * so let it be an exception
+         * in the case when graph of another labeling
+         * is not the same.
+         */
+        Labeling& operator=(const Labeling& labeling) {
+            if (&(this->graph_) != &(labeling.graph_)) {
+                throw invalid_argument(
+                    "You can assign only the labeling "
+                    "with the same disparity graph.");
+            }
+            this->nodes_ = labeling.nodes_;
+            this->penalty_ = labeling.penalty_;
+            return *this;
         }
 };
 
