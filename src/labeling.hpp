@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <set>
 #include <vector>
 
@@ -11,6 +12,7 @@
 using std::find;
 using std::isfinite;
 using std::multiset;
+using std::numeric_limits;
 using std::vector;
 
 /**
@@ -29,6 +31,10 @@ template<typename Color> class Labeling {
          * \brief Labeled nodes.
          */
         vector<DisparityNode> nodes_;
+        /**
+         * \brief Cached value of the penalty.
+         */
+        double penalty_ = numeric_limits<double>::infinity();
         /**
          * \brief Get constant iterator to the node;
          */
@@ -98,14 +104,17 @@ template<typename Color> class Labeling {
          * \brief Calculate total penalty.
          */
         double penalty() {
-            double result = 0;
+            if (isfinite(this->penalty_)) {
+                return this->penalty_;
+            }
+            this->penalty_ = 0;
             for (DisparityNode node : this->nodes_) {
                 for (DisparityNode neighbor : this->neighbors(node, true)) {
-                    result += this->graph_.penalty(node, neighbor);
+                    this->penalty_ += this->graph_.penalty(node, neighbor);
                 }
             }
-            assert(isfinite(result));
-            return result;
+            assert(isfinite(this->penalty_));
+            return this->penalty_;
         }
         /**
          * \brief Change disparity of the node.
@@ -118,6 +127,7 @@ template<typename Color> class Labeling {
                 throw invalid_argument("Provided disparity is not available.");
             }
             *(this->nodeIterator_(node)) = node;
+            this->penalty_ = numeric_limits<double>::infinity();
         }
         /**
          * \brief Get disparity of the node.
@@ -168,6 +178,7 @@ template<typename Color> class Labeling {
                     "with the same disparity graph.");
             }
             this->nodes_ = labeling.nodes_;
+            this->penalty_ = labeling.penalty_;
             return *this;
         }
 };
