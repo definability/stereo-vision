@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+## 0.0.1 - 2017-03-16
+
 ### Added
 
 - Basic project structure.
@@ -17,6 +19,8 @@ and this project adheres to [Semantic Versioning].
 - `Labeling` to represent, change and calculate penalty
   of particular labelings.
 - `BFDisparityFinder` to find disparities using brute-force.
+
+[Unreleased]: https://github.com/char-lie/stereo-vision/compare/v0.0.1...HEAD
 
 [Keep a Changelog]: http://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: http://semver.org/spec/v2.0.0.html
