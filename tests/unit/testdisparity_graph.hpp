@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
-class DisparityGraphTest : public ::testing::Test {
+class DisparityGraphTest : public ::testing::Test
+{
     protected:
         DisparityGraphTest() {};
         virtual ~DisparityGraphTest() {};

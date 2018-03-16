@@ -12,7 +12,8 @@ using std::get;
 
 static double infinity = numeric_limits<double>::infinity();
 
-TEST_P(DisparityGraphInfiniteEdgesTest, CheckParameters) {
+TEST_P(DisparityGraphInfiniteEdgesTest, CheckParameters)
+{
     Matrix<unsigned char> left{10, 10}, right{10, 10};
     DisparityGraph<unsigned char> graph{left, right};
     DisparityNode nodeA = get<0>(GetParam());

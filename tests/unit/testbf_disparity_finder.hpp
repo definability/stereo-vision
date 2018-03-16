@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
-class BFDisparityFinderTest : public ::testing::Test {
+class BFDisparityFinderTest : public ::testing::Test
+{
     protected:
         BFDisparityFinderTest() {};
         virtual ~BFDisparityFinderTest() {};
