@@ -21,7 +21,7 @@ TEST(BFDisparityFinderTest, FindBestTrivial)
     ASSERT_DOUBLE_EQ(labeling.penalty(), 0);
     for (DisparityNode node : labeling.nodes())
     {
-        ASSERT_EQ(node.disparity, 0);
+        ASSERT_EQ(node.disparity, 0ul);
     }
 }
 

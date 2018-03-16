@@ -24,11 +24,11 @@ TEST(LabelingTest, RightAvailableDisparities)
     vector<size_t> disparities;
 
     disparities = labeling.nodeDisparities({9, 9});
-    ASSERT_EQ(disparities.size(), 1);
-    ASSERT_EQ(disparities.front(), 0);
+    ASSERT_EQ(disparities.size(), 1ul);
+    ASSERT_EQ(disparities.front(), 0ul);
 
     disparities = labeling.nodeDisparities({0, 0});
-    ASSERT_EQ(disparities.size(), 2);
+    ASSERT_EQ(disparities.size(), 2ul);
     ASSERT_EQ(disparities[0], 0);
     ASSERT_EQ(disparities[1], 1);
 }
