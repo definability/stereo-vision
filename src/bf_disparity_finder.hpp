@@ -15,49 +15,70 @@ using std::vector;
  */
 template <typename Color> class BFDisparityFinder {
     private:
+        /**
+         * \brief A graph that represents the problem to solve.
+         */
         const DisparityGraph<Color>& graph_;
-        Labeling<Color> labeling_;
-
-        double bestPenalty_ = numeric_limits<double>::infinity();
-        Labeling<Color> bestLabeling_;
-
-        void change_(
-                vector<DisparityNode>::const_iterator currentNode,
-                vector<DisparityNode>::const_iterator end) {
-
-            if (currentNode == end) {
-                return;
+        /**
+         * \brief Find the best labeling.
+         *
+         * For every disparity of current node
+         * check whether this disparity gives the best penalty
+         * and call the procedure for the next node if it exists.
+         */
+        Labeling<Color> find_(
+                Labeling<Color>& labeling,
+                Labeling<Color>& bestLabeling,
+                vector<DisparityNode>::const_iterator currentNode) {
+            if (currentNode == labeling.nodes().end()) {
+                return bestLabeling;
             }
 
-            for (size_t disparity
-                    : this->labeling_.nodeDisparities(*currentNode)) {
-
-                this->labeling_.setNode({
+            for (size_t disparity : labeling.nodeDisparities(*currentNode)) {
+                labeling.setNode({
                     currentNode->row,
                     currentNode->column,
                     disparity
                 });
-                double penalty = this->labeling_.penalty();
-                if (penalty < this->bestPenalty_) {
-                    this->bestLabeling_ = this->labeling_;
-                    this->bestPenalty_ = penalty;
+
+                if (labeling.penalty() < bestLabeling.penalty()) {
+                    bestLabeling = labeling;
                 }
 
-                this->change_(next(currentNode), end);
+                bestLabeling = this->find_(labeling, bestLabeling, next(currentNode));
             }
+            return bestLabeling;
         }
     public:
+        /**
+         * \brief Forbid the default constructor.
+         */
         BFDisparityFinder() = delete;
+        /**
+         * \brief Copy constructor is default.
+         */
         BFDisparityFinder(const BFDisparityFinder&) = default;
+        /**
+         * \brief Move constructor is default.
+         */
+        BFDisparityFinder(BFDisparityFinder&&) = default;
+        /**
+         * \brief Only a graph that describes the problem is needed.
+         */
         explicit BFDisparityFinder(const DisparityGraph<Color>& graph)
-            : graph_{graph}
-            , labeling_{graph}
-            , bestLabeling_{graph} {
+            : graph_{graph} {
         }
+        /**
+         * \brief Find the best labeling using brute force.
+         */
         Labeling<Color> find() {
-            vector<DisparityNode> nodes{this->labeling_.nodes()};
-            this->change_(nodes.begin(), nodes.end());
-            return this->bestLabeling_;
+            Labeling<Color> labeling{this->graph_};
+            Labeling<Color> bestLabeling{labeling};
+            return this->find_(
+                labeling,
+                bestLabeling,
+                labeling.nodes().begin()
+            );
         }
 };
 
