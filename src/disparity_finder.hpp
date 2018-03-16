@@ -31,10 +31,6 @@ template <typename Color> class DisparityFinder
          */
         DisparityFinder(DisparityFinder&&) = default;
         /**
-         * \brief Only a graph that describes the problem is needed.
-         */
-        virtual ~DisparityFinder() = default;
-        /**
          * \brief A graph that describes the problem
          * is needed for any strategy.
          */
@@ -42,6 +38,10 @@ template <typename Color> class DisparityFinder
             : graph_{graph}
         {
         }
+        /**
+         * \brief Destructor is default.
+         */
+        virtual ~DisparityFinder() = default;
         /**
          * \brief Find the best labeling.
          */
