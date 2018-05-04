@@ -1,6 +1,7 @@
 #ifndef DISPARITY_GRAPH_HPP
 #define DISPARITY_GRAPH_HPP
 
+#include <algorithm>
 #include <cassert>
 #include <limits>
 #include <stdexcept>
@@ -13,6 +14,7 @@ using std::invalid_argument;
 using std::numeric_limits;
 using std::swap;
 using std::vector;
+using std::min;
 
 /**
  * \brief An information that uniquely identifies a node like coordinates.
@@ -388,6 +390,101 @@ template<typename Color> class DisparityGraph
             else
             {
                 return result;
+            }
+        }
+        vector<size_t> nodeDisparities(const DisparityNode& node) const
+        {
+            this->checkNode(node);
+            vector<size_t> result;
+            for (size_t disparity = 0;
+                 disparity + node.column < this->leftImage_.columns() && disparity < DisparityNode::MAX_DISPARITY;
+                 ++disparity)
+            {
+                result.push_back(disparity);
+            }
+            return result;
+        }
+        const size_t minDisparity(const DisparityNode& node) const
+        {
+            this->checkNode(node);
+            return 0;
+        }
+        size_t maxDisparity(const DisparityNode& node) const
+        {
+            this->checkNode(node);
+            return min(
+                this->leftImage_.columns() - node.column,
+                +DisparityNode::MAX_DISPARITY
+            );
+        }
+        size_t minNeighborDisparity(
+            const DisparityNode& node, DisparityNode neighbor)
+            const
+        {
+            this->checkNode(node);
+            this->checkNode(neighbor);
+
+            if (node.row != neighbor.row && !this->edgeExists(node, neighbor))
+            {
+                return 0;
+            }
+            if (node.row != neighbor.row)
+            {
+                return 0;
+            }
+            else if (node.row == neighbor.row
+                  && node.column == neighbor.column + 1)
+            {
+                return 0;
+            }
+            else if (node.row == neighbor.row
+                  && node.column + 1 == neighbor.column)
+            {
+                return node.disparity ? node.disparity - 1 : 0;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        size_t maxNeighborDisparity(
+            const DisparityNode& node, const DisparityNode& neighbor)
+            const
+        {
+            this->checkNode(node);
+            this->checkNode(neighbor);
+            size_t columns = this->leftImage_.columns();
+
+            if (node.row != neighbor.row && !this->edgeExists(node, neighbor))
+            {
+                return 0;
+            }
+            if (node.row != neighbor.row)
+            {
+                return min(
+                    columns - neighbor.column,
+                    +DisparityNode::MAX_DISPARITY
+                );
+            }
+            else if (node.row == neighbor.row
+                  && node.column == neighbor.column + 1)
+            {
+                return min(
+                    node.disparity + 2,
+                    +DisparityNode::MAX_DISPARITY
+                );
+            }
+            else if (node.row == neighbor.row
+                  && node.column + 1 == neighbor.column)
+            {
+                return min(
+                    columns - neighbor.column,
+                    +DisparityNode::MAX_DISPARITY
+                );
+            }
+            else
+            {
+                return 0;
             }
         }
         /**
