@@ -114,8 +114,8 @@ TEST(DisparityGraphTest, GetNodeNeighbors)
         ASSERT_TRUE(graph.edgeExists({5, 6}, neighbor));
     }
 
-    ASSERT_EQ(graph.nodeNeighbors({9, 9}, true).size(), 0);
-    ASSERT_EQ(graph.nodeNeighbors({9, 9}, false).size(), 2);
+    ASSERT_EQ(graph.nodeNeighbors({9, 9}, true).size(), 0ul);
+    ASSERT_EQ(graph.nodeNeighbors({9, 9}, false).size(), 2ul);
 }
 
 TEST(DisparityGraphTest, VisitAllNodesFromStart)
