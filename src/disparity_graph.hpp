@@ -45,6 +45,7 @@ struct DisparityNode
      * \f]
      */
     size_t disparity;
+    size_t index = -1ul;
     /**
      * \brief Comparison operator to use nodes
      * as map keys.
@@ -275,12 +276,18 @@ template<typename Color> class DisparityGraph
 
             size_t rows = this->rightImage_.rows();
             size_t columns = this->rightImage_.columns();
+            size_t index;
 
             for (size_t row = 0; row < rows; ++row)
             {
                 for (size_t column = 0; column < columns; ++column)
                 {
-                    result[row * columns + column] = {row, column};
+                    index = row * columns + column;
+                    result[index] = {
+                        .row = row,
+                        .column = column,
+                        .index = index
+                    };
                 }
             }
             return result;
@@ -292,15 +299,24 @@ template<typename Color> class DisparityGraph
                                             bool directed = false) const
         {
             this->checkNode(node);
+            assert(node.index != -1);
             vector<DisparityNode> result;
 
             if (node.column < this->rightImage_.columns() - 1)
             {
-                result.push_back({node.row, node.column + 1});
+                result.push_back({
+                    .row = node.row,
+                    .column = node.column + 1,
+                    .index = node.row * this->columns() + node.column + 1
+                });
             }
             if (node.row < this->rightImage_.rows() - 1)
             {
-                result.push_back({node.row + 1, node.column});
+                result.push_back({
+                    .row = node.row + 1,
+                    .column = node.column,
+                    .index = (node.row + 1) * this->columns() + node.column
+                });
             }
 
             if (directed)
@@ -311,11 +327,19 @@ template<typename Color> class DisparityGraph
 
             if (node.column > 0)
             {
-                result.push_back({node.row, node.column - 1});
+                result.push_back({
+                    .row = node.row,
+                    .column = node.column - 1,
+                    .index = node.row * this->columns() + node.column - 1
+                });
             }
             if (node.row > 0)
             {
-                result.push_back({node.row - 1, node.column});
+                result.push_back({
+                    .row = node.row - 1,
+                    .column = node.column,
+                    .index = (node.row - 1) * this->columns() + node.column
+                });
             }
 
             assert(result.size() == this->nodeNeighborsCount_(node));
