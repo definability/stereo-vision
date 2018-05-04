@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning].
 - `DisparityFinder` base class.
 - `BooleanGraph` class.
 
+### Fixed
+
+- `find` virtual class member of `DisparityFinder`.
+
 ## 0.0.1 - 2017-03-16
 
 ### Added
