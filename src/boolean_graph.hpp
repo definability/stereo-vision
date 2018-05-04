@@ -234,7 +234,7 @@ template<typename Color> class BooleanGraph {
         /**
          * \brief Initialize the boolean graph based on disparity graph.
          */
-        BooleanGraph(const DisparityGraph<Color>& graph)
+        explicit BooleanGraph(const DisparityGraph<Color>& graph)
             : graph_{graph}
             , nodes_{graph.availableNodes()}
         {
