@@ -278,7 +278,7 @@ template<typename Color> class DisparityGraph
                 for (size_t column = 0; column < columns; ++column)
                 {
                     index = row * columns + column;
-                    result[index] = {
+                    result[index] = DisparityNode{
                         .row = row,
                         .column = column,
                         .index = index
@@ -299,7 +299,7 @@ template<typename Color> class DisparityGraph
 
             if (node.column < this->rightImage_.columns() - 1)
             {
-                result.push_back({
+                result.push_back(DisparityNode{
                     .row = node.row,
                     .column = node.column + 1,
                     .index = node.row * this->columns() + node.column + 1
@@ -307,7 +307,7 @@ template<typename Color> class DisparityGraph
             }
             if (node.row < this->rightImage_.rows() - 1)
             {
-                result.push_back({
+                result.push_back(DisparityNode{
                     .row = node.row + 1,
                     .column = node.column,
                     .index = (node.row + 1) * this->columns() + node.column
@@ -322,7 +322,7 @@ template<typename Color> class DisparityGraph
 
             if (node.column > 0)
             {
-                result.push_back({
+                result.push_back(DisparityNode{
                     .row = node.row,
                     .column = node.column - 1,
                     .index = node.row * this->columns() + node.column - 1
@@ -330,7 +330,7 @@ template<typename Color> class DisparityGraph
             }
             if (node.row > 0)
             {
-                result.push_back({
+                result.push_back(DisparityNode{
                     .row = node.row - 1,
                     .column = node.column,
                     .index = (node.row - 1) * this->columns() + node.column
