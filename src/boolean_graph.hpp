@@ -165,7 +165,7 @@ template<typename Color> class BooleanGraph {
             return changed;
         }
         /**
-         * \brief Allocated all needed data and prepare initial availability.
+         * \brief Allocate all needed data and prepare initial availability.
          */
         void initialize_()
         {
