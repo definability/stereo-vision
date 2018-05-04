@@ -87,7 +87,6 @@ template<typename Color> class BooleanGraph {
                 {
                     neighbor.disparity = neighborDisparity;
                     this->removeEdge(node, neighbor);
-                    assert(!this->edgeAvailable_(neighbor, node));
                 }
             }
         }
@@ -275,7 +274,6 @@ template<typename Color> class BooleanGraph {
                         this->edgesAvailability_[nodeIndex].size()
                         > disparity);
                     this->nodesAvailability_[nodeIndex][disparity] = true;
-                    assert(this->nodeAvailable(node));
                     for (DisparityNode neighbor
                        : this->graph_.nodeNeighbors(node, true))
                     {
@@ -298,8 +296,6 @@ template<typename Color> class BooleanGraph {
                             this->edgesAvailability_
                                 [nodeIndex][disparity]
                                 [neighborIndex][neighborDisparity] = true;
-                            assert(this->edgeAvailable_(node, neighbor));
-                            assert(this->edgeAvailable_(neighbor, node));
                         }
                     }
                 }
@@ -359,8 +355,6 @@ template<typename Color> class BooleanGraph {
                 this->edgesAvailability_
                     [nodeIndex][node.disparity]
                     [neighborIndex][neighbor.disparity] = false;
-                assert(!edgeAvailable_(neighbor, node));
-                assert(!edgeAvailable_(node, neighbor));
             }
             else
             {
