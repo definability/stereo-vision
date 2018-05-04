@@ -45,7 +45,7 @@ template <typename Color> class DisparityFinder
         /**
          * \brief Find the best labeling.
          */
-        virtual Labeling<Color> find();
+        virtual Labeling<Color> find() = 0;
 };
 
 #endif
