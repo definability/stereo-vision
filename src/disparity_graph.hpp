@@ -45,6 +45,36 @@ struct DisparityNode
      * \f]
      */
     size_t disparity;
+    /**
+     * \brief Comparison operator to use nodes
+     * as map keys.
+     */
+    bool operator<(const DisparityNode& node) const
+    {
+        if (this->row < node.row)
+        {
+            return true;
+        }
+        else if (this->row > node.row)
+        {
+            return false;
+        }
+        else if (this->column < node.column)
+        {
+            return true;
+        }
+        else if (this->column > node.column)
+        {
+            return false;
+        }
+        else if (this->disparity < node.disparity)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 };
 
 /**
