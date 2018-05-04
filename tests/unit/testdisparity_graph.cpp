@@ -92,7 +92,7 @@ TEST(DisparityGraphTest, GetNodeNeighbors)
 
     neighbors = graph.nodeNeighbors({0, 0}, false);
 
-    ASSERT_EQ(neighbors.size(), 2);
+    ASSERT_EQ(neighbors.size(), 2ul);
     ASSERT_EQ(neighbors[0].row, 0);
     ASSERT_EQ(neighbors[0].column, 1);
     ASSERT_EQ(neighbors[1].row, 1);
@@ -104,7 +104,7 @@ TEST(DisparityGraphTest, GetNodeNeighbors)
 
     neighbors = graph.nodeNeighbors({5, 6}, true);
 
-    ASSERT_EQ(neighbors.size(), 2);
+    ASSERT_EQ(neighbors.size(), 2ul);
     ASSERT_EQ(neighbors[0].row, 5);
     ASSERT_EQ(neighbors[0].column, 7);
     ASSERT_EQ(neighbors[1].row, 6);
@@ -185,7 +185,7 @@ TEST(DisparityGraphTest, GetNeighborDisparities)
     DisparityGraph<unsigned char> graph{left, right};
 
     vector<size_t> disparities = graph.neighborDisparities({4, 2, 2}, {4, 3});
-    ASSERT_EQ(disparities.size(), 6);
+    ASSERT_EQ(disparities.size(), 6ul);
     for (size_t i = 0; i < disparities.size(); ++i)
     {
         disparities[i] = i + 1;
