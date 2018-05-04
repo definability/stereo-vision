@@ -126,24 +126,6 @@ template<typename Color> class DisparityGraph
             this->checkNode(nodeA);
             this->checkNode(nodeB);
         }
-        /**
-         * \brief Calculate number of neighbor nodes of the given one.
-         *
-         * There are four possible neighbors:
-         * left, right, top and bottom.
-         *
-         * If the pixel of located in a corder or on a border,
-         * it obviously has less number of neighbors.
-         */
-        size_t nodeNeighborsCount_(const DisparityNode& node,
-                                   bool directed = false) const
-        {
-            return
-                (node.row > 0 && !directed)
-                + (node.row < this->rightImage_.rows() - 1)
-                + (node.column > 0 && !directed)
-                + (node.column < this->rightImage_.columns() - 1);
-        }
     public:
         DisparityGraph() = delete;
         /**
@@ -235,8 +217,8 @@ template<typename Color> class DisparityGraph
                 return numeric_limits<double>::infinity();
             }
             double nodesPenalty =
-                this->nodePenalty(nodeA) / this->nodeNeighborsCount_(nodeA)
-                + this->nodePenalty(nodeB) / this->nodeNeighborsCount_(nodeB);
+                this->nodePenalty(nodeA) / this->nodeNeighborsCount(nodeA)
+                + this->nodePenalty(nodeB) / this->nodeNeighborsCount(nodeB);
             double neighboringPenalty = (nodeA.disparity - nodeB.disparity)
                                       * (nodeA.disparity - nodeB.disparity);
             return nodesPenalty + this->consistency_ * neighboringPenalty;
@@ -323,7 +305,7 @@ template<typename Color> class DisparityGraph
 
             if (directed)
             {
-                assert(result.size() == this->nodeNeighborsCount_(node, true));
+                assert(result.size() == this->nodeNeighborsCount(node, true));
                 return result;
             }
 
@@ -344,7 +326,7 @@ template<typename Color> class DisparityGraph
                 });
             }
 
-            assert(result.size() == this->nodeNeighborsCount_(node));
+            assert(result.size() == this->nodeNeighborsCount(node));
             return result;
         }
         /**
@@ -503,6 +485,24 @@ template<typename Color> class DisparityGraph
         double nodePenalty(size_t row, size_t column, size_t disparity) const
         {
             return this->nodePenalty({row, column, disparity});
+        }
+        /**
+         * \brief Calculate number of neighbor nodes of the given one.
+         *
+         * There are four possible neighbors:
+         * left, right, top and bottom.
+         *
+         * If the pixel of located in a corder or on a border,
+         * it obviously has less number of neighbors.
+         */
+        size_t nodeNeighborsCount(const DisparityNode& node,
+                                  bool directed = false) const
+        {
+            return
+                (node.row > 0 && !directed)
+                + (node.row < this->rightImage_.rows() - 1)
+                + (node.column > 0 && !directed)
+                + (node.column < this->rightImage_.columns() - 1);
         }
         /**
          * \brief Get number of columns of the right image.
