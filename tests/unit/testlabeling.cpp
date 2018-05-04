@@ -29,8 +29,8 @@ TEST(LabelingTest, RightAvailableDisparities)
 
     disparities = labeling.nodeDisparities({0, 0});
     ASSERT_EQ(disparities.size(), 2ul);
-    ASSERT_EQ(disparities[0], 0);
-    ASSERT_EQ(disparities[1], 1);
+    ASSERT_EQ(disparities[0], 0ul);
+    ASSERT_EQ(disparities[1], 1ul);
 }
 
 TEST(LabelingTest, SetNodeSuccess)
@@ -39,11 +39,11 @@ TEST(LabelingTest, SetNodeSuccess)
     DisparityGraph<unsigned char> graph{left, right};
     Labeling<unsigned char> labeling{graph};
 
-    ASSERT_EQ(labeling.disparity({0, 0}), 0);
+    ASSERT_EQ(labeling.disparity({0, 0}), 0ul);
     labeling.setNode({0, 0, 1});
-    ASSERT_EQ(labeling.disparity({0, 0}), 1);
+    ASSERT_EQ(labeling.disparity({0, 0}), 1ul);
     labeling.setNode({0, 0, 0});
-    ASSERT_EQ(labeling.disparity({0, 0}), 0);
+    ASSERT_EQ(labeling.disparity({0, 0}), 0ul);
 }
 
 TEST(LabelingTest, SetNodesSuccess)
@@ -52,13 +52,13 @@ TEST(LabelingTest, SetNodesSuccess)
     DisparityGraph<unsigned char> graph{left, right};
     Labeling<unsigned char> labeling{graph};
 
-    ASSERT_EQ(labeling.disparity({5, 5}), 0);
+    ASSERT_EQ(labeling.disparity({5, 5}), 0ul);
     labeling.setNode({5, 5, 1});
-    ASSERT_EQ(labeling.disparity({5, 5}), 1);
+    ASSERT_EQ(labeling.disparity({5, 5}), 1ul);
     labeling.setNode({5, 4, 2});
-    ASSERT_EQ(labeling.disparity({5, 4}), 2);
+    ASSERT_EQ(labeling.disparity({5, 4}), 2ul);
     labeling.setNode({5, 3, 3});
-    ASSERT_EQ(labeling.disparity({5, 3}), 3);
+    ASSERT_EQ(labeling.disparity({5, 3}), 3ul);
 }
 
 TEST(LabelingTest, PenaltyRight)
@@ -67,9 +67,9 @@ TEST(LabelingTest, PenaltyRight)
     DisparityGraph<unsigned char> graph{left, right};
     Labeling<unsigned char> labeling{graph};
 
-    ASSERT_DOUBLE_EQ(labeling.penalty(), 0);
+    ASSERT_DOUBLE_EQ(labeling.penalty(), 0ul);
     labeling.setNode({0, 0, 1});
-    ASSERT_DOUBLE_EQ(labeling.penalty(), 2);
+    ASSERT_DOUBLE_EQ(labeling.penalty(), 2ul);
     labeling.setNode({5, 5, 1});
     ASSERT_DOUBLE_EQ(labeling.penalty(), 2 + 4 * 1);
     labeling.setNode({5, 4, 2});

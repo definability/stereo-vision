@@ -80,7 +80,7 @@ TEST(DisparityGraphTest, GetAllNodes)
     {
         ASSERT_EQ(item.disparity, 0ul);
     }
-    ASSERT_EQ(graph.availableNodes().size(), 100);
+    ASSERT_EQ(graph.availableNodes().size(), 100ul);
 }
 
 TEST(DisparityGraphTest, GetNodeNeighbors)
