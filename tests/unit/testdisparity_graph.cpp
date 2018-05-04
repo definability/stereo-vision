@@ -93,10 +93,10 @@ TEST(DisparityGraphTest, GetNodeNeighbors)
     neighbors = graph.nodeNeighbors({0, 0}, false);
 
     ASSERT_EQ(neighbors.size(), 2ul);
-    ASSERT_EQ(neighbors[0].row, 0);
-    ASSERT_EQ(neighbors[0].column, 1);
-    ASSERT_EQ(neighbors[1].row, 1);
-    ASSERT_EQ(neighbors[1].column, 0);
+    ASSERT_EQ(neighbors[0].row, 0ul);
+    ASSERT_EQ(neighbors[0].column, 1ul);
+    ASSERT_EQ(neighbors[1].row, 1ul);
+    ASSERT_EQ(neighbors[1].column, 0ul);
     for (auto neighbor : neighbors)
     {
         ASSERT_TRUE(graph.edgeExists({0, 0}, neighbor));
@@ -105,10 +105,10 @@ TEST(DisparityGraphTest, GetNodeNeighbors)
     neighbors = graph.nodeNeighbors({5, 6}, true);
 
     ASSERT_EQ(neighbors.size(), 2ul);
-    ASSERT_EQ(neighbors[0].row, 5);
-    ASSERT_EQ(neighbors[0].column, 7);
-    ASSERT_EQ(neighbors[1].row, 6);
-    ASSERT_EQ(neighbors[1].column, 6);
+    ASSERT_EQ(neighbors[0].row, 5ul);
+    ASSERT_EQ(neighbors[0].column, 7ul);
+    ASSERT_EQ(neighbors[1].row, 6ul);
+    ASSERT_EQ(neighbors[1].column, 6ul);
     for (auto neighbor : neighbors)
     {
         ASSERT_TRUE(graph.edgeExists({5, 6}, neighbor));
