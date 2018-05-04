@@ -76,6 +76,8 @@ struct DisparityNode
             return false;
         }
     }
+
+    static const size_t MAX_DISPARITY = 16;
 };
 
 /**
@@ -366,7 +368,7 @@ template<typename Color> class DisparityGraph
             else if (node.row != neighbor.row)
             {
                 for (size_t disparity = 0;
-                        neighbor.column + disparity < columns; ++disparity)
+                        neighbor.column + disparity < columns && disparity < DisparityNode::MAX_DISPARITY; ++disparity)
                 {
                     assert(this->edgeExists(
                         node, {neighbor.row,  neighbor.column, disparity}));
@@ -377,7 +379,7 @@ template<typename Color> class DisparityGraph
             else if (node.row == neighbor.row
                   && node.column == neighbor.column + 1)
             {
-                for (size_t disparity = 0; disparity <= node.disparity + 1;
+                for (size_t disparity = 0; disparity <= node.disparity + 1 && disparity < DisparityNode::MAX_DISPARITY;
                         ++disparity)
                 {
                     assert(this->edgeExists(
@@ -392,7 +394,7 @@ template<typename Color> class DisparityGraph
                 for (size_t disparity = (node.disparity
                             ? node.disparity - 1
                             : 0);
-                        neighbor.column + disparity < columns;
+                        neighbor.column + disparity < columns && disparity < DisparityNode::MAX_DISPARITY;
                         ++disparity)
                 {
                     assert(this->edgeExists(
