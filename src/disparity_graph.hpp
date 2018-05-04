@@ -47,6 +47,11 @@ struct DisparityNode
      * \f]
      */
     size_t disparity;
+    /**
+     * \brief Node index.
+     *
+     * Handy for fast access to nodes.
+     */
     size_t index = -1ul;
     /**
      * \brief Comparison operator to use nodes
@@ -78,7 +83,11 @@ struct DisparityNode
             return false;
         }
     }
-
+    /**
+     * \brief Maximum available disparity.
+     *
+     * Needed to avoid memory overflow.
+     */
     static const size_t MAX_DISPARITY = 16;
 };
 
@@ -397,6 +406,10 @@ template<typename Color> class DisparityGraph
                 return result;
             }
         }
+        /**
+         * \brief Available disparities of the node
+         * without taking neighbors into account.
+         */
         vector<size_t> nodeDisparities(const DisparityNode& node) const
         {
             this->checkNode(node);
@@ -410,11 +423,27 @@ template<typename Color> class DisparityGraph
             }
             return result;
         }
+        /**
+         * \brief Minimal disparities of the node
+         * without taking neighbors into account.
+         *
+         * Usage of this function is faster than
+         * nodeDisparities(),
+         * because this class member doesn't create useless vector.
+         */
         const size_t minDisparity(const DisparityNode& node) const
         {
             this->checkNode(node);
             return 0;
         }
+        /**
+         * \brief Maximal disparities of the node
+         * without taking neighbors into account.
+         *
+         * Usage of this function is faster than
+         * nodeDisparities(),
+         * because this class member doesn't create useless vector.
+         */
         size_t maxDisparity(const DisparityNode& node) const
         {
             this->checkNode(node);
@@ -423,6 +452,14 @@ template<typename Color> class DisparityGraph
                 +DisparityNode::MAX_DISPARITY
             );
         }
+        /**
+         * \brief Minimal disparities of neighbor of the node,
+         * which takes disparity of current node into account.
+         *
+         * Usage of this function is faster than
+         * neighborDisparities()
+         * because this class member doesn't create useless vector.
+         */
         size_t minNeighborDisparity(
             const DisparityNode& node, DisparityNode neighbor)
             const
@@ -453,6 +490,14 @@ template<typename Color> class DisparityGraph
                 return 0;
             }
         }
+        /**
+         * \brief Maximal disparities of neighbor of the node,
+         * which takes disparity of current node into account.
+         *
+         * Usage of this function is faster than
+         * neighborDisparities()
+         * because this class member doesn't create useless vector.
+         */
         size_t maxNeighborDisparity(
             const DisparityNode& node, const DisparityNode& neighbor)
             const
