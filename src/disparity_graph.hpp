@@ -337,7 +337,7 @@ template<typename Color> class DisparityGraph
                 const
         {
             vector<size_t> result;
-            size_t columns = this->rightImage_.columns();
+            size_t columns = this->leftImage_.columns();
             neighbor.disparity = 0;
 
             this->checkNode(node);
