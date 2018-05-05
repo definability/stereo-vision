@@ -11,7 +11,6 @@ target_link_libraries(
     labeling
     disparity-finder
     bf-disparity-finder
-    diffusion-disparity-finder
 
     libgtest
     libgmock
