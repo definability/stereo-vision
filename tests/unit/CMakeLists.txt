@@ -6,11 +6,12 @@ add_executable(testunit ${SRCS})
 target_link_libraries(
     testunit
 
-    libdisparity-graph
-    libmatrix
-    liblabeling
-    libbf_disparity_finder
-    libdisparity_finder
+    disparity-graph
+    matrix
+    labeling
+    disparity-finder
+    bf-disparity-finder
+    diffusion-disparity-finder
 
     libgtest
     libgmock
