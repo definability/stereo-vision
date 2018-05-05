@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning].
 ### Added
 
 - `DisparityFinder` base class.
+- `BooleanGraph` class.
 
 ### Fixed
 

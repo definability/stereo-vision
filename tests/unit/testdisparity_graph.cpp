@@ -80,7 +80,7 @@ TEST(DisparityGraphTest, GetAllNodes)
     {
         ASSERT_EQ(item.disparity, 0ul);
     }
-    ASSERT_EQ(graph.availableNodes().size(), 100);
+    ASSERT_EQ(graph.availableNodes().size(), 100ul);
 }
 
 TEST(DisparityGraphTest, GetNodeNeighbors)
@@ -92,11 +92,11 @@ TEST(DisparityGraphTest, GetNodeNeighbors)
 
     neighbors = graph.nodeNeighbors({0, 0}, false);
 
-    ASSERT_EQ(neighbors.size(), 2);
-    ASSERT_EQ(neighbors[0].row, 0);
-    ASSERT_EQ(neighbors[0].column, 1);
-    ASSERT_EQ(neighbors[1].row, 1);
-    ASSERT_EQ(neighbors[1].column, 0);
+    ASSERT_EQ(neighbors.size(), 2ul);
+    ASSERT_EQ(neighbors[0].row, 0ul);
+    ASSERT_EQ(neighbors[0].column, 1ul);
+    ASSERT_EQ(neighbors[1].row, 1ul);
+    ASSERT_EQ(neighbors[1].column, 0ul);
     for (auto neighbor : neighbors)
     {
         ASSERT_TRUE(graph.edgeExists({0, 0}, neighbor));
@@ -104,18 +104,18 @@ TEST(DisparityGraphTest, GetNodeNeighbors)
 
     neighbors = graph.nodeNeighbors({5, 6}, true);
 
-    ASSERT_EQ(neighbors.size(), 2);
-    ASSERT_EQ(neighbors[0].row, 5);
-    ASSERT_EQ(neighbors[0].column, 7);
-    ASSERT_EQ(neighbors[1].row, 6);
-    ASSERT_EQ(neighbors[1].column, 6);
+    ASSERT_EQ(neighbors.size(), 2ul);
+    ASSERT_EQ(neighbors[0].row, 5ul);
+    ASSERT_EQ(neighbors[0].column, 7ul);
+    ASSERT_EQ(neighbors[1].row, 6ul);
+    ASSERT_EQ(neighbors[1].column, 6ul);
     for (auto neighbor : neighbors)
     {
         ASSERT_TRUE(graph.edgeExists({5, 6}, neighbor));
     }
 
-    ASSERT_EQ(graph.nodeNeighbors({9, 9}, true).size(), 0);
-    ASSERT_EQ(graph.nodeNeighbors({9, 9}, false).size(), 2);
+    ASSERT_EQ(graph.nodeNeighbors({9, 9}, true).size(), 0ul);
+    ASSERT_EQ(graph.nodeNeighbors({9, 9}, false).size(), 2ul);
 }
 
 TEST(DisparityGraphTest, VisitAllNodesFromStart)
@@ -185,7 +185,7 @@ TEST(DisparityGraphTest, GetNeighborDisparities)
     DisparityGraph<unsigned char> graph{left, right};
 
     vector<size_t> disparities = graph.neighborDisparities({4, 2, 2}, {4, 3});
-    ASSERT_EQ(disparities.size(), 6);
+    ASSERT_EQ(disparities.size(), 6ul);
     for (size_t i = 0; i < disparities.size(); ++i)
     {
         disparities[i] = i + 1;

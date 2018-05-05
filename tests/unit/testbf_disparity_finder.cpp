@@ -34,5 +34,5 @@ TEST(BFDisparityFinderTest, FindBestDot)
     BFDisparityFinder<unsigned char> finder{graph};
     Labeling<unsigned char> labeling{finder.find()};
     ASSERT_DOUBLE_EQ(labeling.penalty(), 3);
-    ASSERT_EQ(labeling.disparity({1, 0}), 1);
+    ASSERT_EQ(labeling.disparity({1, 0}), 1ul);
 }

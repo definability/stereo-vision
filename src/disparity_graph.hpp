@@ -1,6 +1,7 @@
 #ifndef DISPARITY_GRAPH_HPP
 #define DISPARITY_GRAPH_HPP
 
+#include <algorithm>
 #include <cassert>
 #include <limits>
 #include <stdexcept>
@@ -13,6 +14,7 @@ using std::invalid_argument;
 using std::numeric_limits;
 using std::swap;
 using std::vector;
+using std::min;
 
 /**
  * \brief An information that uniquely identifies a node like coordinates.
@@ -45,6 +47,48 @@ struct DisparityNode
      * \f]
      */
     size_t disparity;
+    /**
+     * \brief Node index.
+     *
+     * Handy for fast access to nodes.
+     */
+    size_t index = -1ul;
+    /**
+     * \brief Comparison operator to use nodes
+     * as map keys.
+     */
+    bool operator<(const DisparityNode& node) const
+    {
+        if (this->row < node.row)
+        {
+            return true;
+        }
+        else if (this->row > node.row)
+        {
+            return false;
+        }
+        else if (this->column < node.column)
+        {
+            return true;
+        }
+        else if (this->column > node.column)
+        {
+            return false;
+        }
+        else if (this->disparity < node.disparity)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    /**
+     * \brief Maximum available disparity.
+     *
+     * Needed to avoid memory overflow.
+     */
+    static const size_t MAX_DISPARITY = 16;
 };
 
 /**
@@ -92,24 +136,6 @@ template<typename Color> class DisparityGraph
             }
             this->checkNode(nodeA);
             this->checkNode(nodeB);
-        }
-        /**
-         * \brief Calculate number of neighbor nodes of the given one.
-         *
-         * There are four possible neighbors:
-         * left, right, top and bottom.
-         *
-         * If the pixel of located in a corder or on a border,
-         * it obviously has less number of neighbors.
-         */
-        size_t nodeNeighborsCount_(const DisparityNode& node,
-                                   bool directed = false) const
-        {
-            return
-                (node.row > 0 && !directed)
-                + (node.row < this->rightImage_.rows() - 1)
-                + (node.column > 0 && !directed)
-                + (node.column < this->rightImage_.columns() - 1);
         }
     public:
         DisparityGraph() = delete;
@@ -202,8 +228,8 @@ template<typename Color> class DisparityGraph
                 return numeric_limits<double>::infinity();
             }
             double nodesPenalty =
-                this->nodePenalty(nodeA) / this->nodeNeighborsCount_(nodeA)
-                + this->nodePenalty(nodeB) / this->nodeNeighborsCount_(nodeB);
+                this->nodePenalty(nodeA) / this->nodeNeighborsCount(nodeA)
+                + this->nodePenalty(nodeB) / this->nodeNeighborsCount(nodeB);
             double neighboringPenalty = (nodeA.disparity - nodeB.disparity)
                                       * (nodeA.disparity - nodeB.disparity);
             return nodesPenalty + this->consistency_ * neighboringPenalty;
@@ -245,12 +271,16 @@ template<typename Color> class DisparityGraph
 
             size_t rows = this->rightImage_.rows();
             size_t columns = this->rightImage_.columns();
+            size_t index;
 
             for (size_t row = 0; row < rows; ++row)
             {
                 for (size_t column = 0; column < columns; ++column)
                 {
-                    result[row * columns + column] = {row, column};
+                    index = row * columns + column;
+                    result[index].row = row;
+                    result[index].column = column;
+                    result[index].index = index;
                 }
             }
             return result;
@@ -262,33 +292,46 @@ template<typename Color> class DisparityGraph
                                             bool directed = false) const
         {
             this->checkNode(node);
+            assert(node.index != -1);
             vector<DisparityNode> result;
 
             if (node.column < this->rightImage_.columns() - 1)
             {
-                result.push_back({node.row, node.column + 1});
+                result.push_back(DisparityNode{});
+                result[result.size() - 1].row = node.row;
+                result[result.size() - 1].column = node.column + 1;
+                result[result.size() - 1].index = node.row * this->columns() + node.column + 1;
             }
             if (node.row < this->rightImage_.rows() - 1)
             {
-                result.push_back({node.row + 1, node.column});
+                result.push_back(DisparityNode{});
+                result[result.size() - 1].row = node.row + 1;
+                result[result.size() - 1].column = node.column;
+                result[result.size() - 1].index = (node.row + 1) * this->columns() + node.column;
             }
 
             if (directed)
             {
-                assert(result.size() == this->nodeNeighborsCount_(node, true));
+                assert(result.size() == this->nodeNeighborsCount(node, true));
                 return result;
             }
 
             if (node.column > 0)
             {
-                result.push_back({node.row, node.column - 1});
+                result.push_back(DisparityNode{});
+                result[result.size() - 1].row = node.row;
+                result[result.size() - 1].column = node.column - 1;
+                result[result.size() - 1].index = node.row * this->columns() + node.column - 1;
             }
             if (node.row > 0)
             {
-                result.push_back({node.row - 1, node.column});
+                result.push_back(DisparityNode{});
+                result[result.size() - 1].row = node.row - 1;
+                result[result.size() - 1].column = node.column;
+                result[result.size() - 1].index = (node.row - 1) * this->columns() + node.column;
             }
 
-            assert(result.size() == this->nodeNeighborsCount_(node));
+            assert(result.size() == this->nodeNeighborsCount(node));
             return result;
         }
         /**
@@ -299,7 +342,7 @@ template<typename Color> class DisparityGraph
                 const
         {
             vector<size_t> result;
-            size_t columns = this->rightImage_.columns();
+            size_t columns = this->leftImage_.columns();
             neighbor.disparity = 0;
 
             this->checkNode(node);
@@ -312,7 +355,9 @@ template<typename Color> class DisparityGraph
             else if (node.row != neighbor.row)
             {
                 for (size_t disparity = 0;
-                        neighbor.column + disparity < columns; ++disparity)
+                     neighbor.column + disparity < columns
+                     && disparity < DisparityNode::MAX_DISPARITY;
+                     ++disparity)
                 {
                     assert(this->edgeExists(
                         node, {neighbor.row,  neighbor.column, disparity}));
@@ -323,8 +368,10 @@ template<typename Color> class DisparityGraph
             else if (node.row == neighbor.row
                   && node.column == neighbor.column + 1)
             {
-                for (size_t disparity = 0; disparity <= node.disparity + 1;
-                        ++disparity)
+                for (size_t disparity = 0;
+                     disparity <= node.disparity + 1
+                     && disparity < DisparityNode::MAX_DISPARITY;
+                     ++disparity)
                 {
                     assert(this->edgeExists(
                         node, {neighbor.row,  neighbor.column, disparity}));
@@ -338,8 +385,9 @@ template<typename Color> class DisparityGraph
                 for (size_t disparity = (node.disparity
                             ? node.disparity - 1
                             : 0);
-                        neighbor.column + disparity < columns;
-                        ++disparity)
+                     neighbor.column + disparity < columns
+                     && disparity < DisparityNode::MAX_DISPARITY;
+                     ++disparity)
                 {
                     assert(this->edgeExists(
                         node, {neighbor.row,  neighbor.column, disparity}));
@@ -350,6 +398,138 @@ template<typename Color> class DisparityGraph
             else
             {
                 return result;
+            }
+        }
+        /**
+         * \brief Available disparities of the node
+         * without taking neighbors into account.
+         */
+        vector<size_t> nodeDisparities(const DisparityNode& node) const
+        {
+            this->checkNode(node);
+            vector<size_t> result;
+            for (size_t disparity = 0;
+                 disparity + node.column < this->leftImage_.columns()
+                 && disparity < DisparityNode::MAX_DISPARITY;
+                 ++disparity)
+            {
+                result.push_back(disparity);
+            }
+            return result;
+        }
+        /**
+         * \brief Minimal disparities of the node
+         * without taking neighbors into account.
+         *
+         * Usage of this function is faster than
+         * nodeDisparities(),
+         * because this class member doesn't create useless vector.
+         */
+        const size_t minDisparity(const DisparityNode& node) const
+        {
+            this->checkNode(node);
+            return 0;
+        }
+        /**
+         * \brief Maximal disparities of the node
+         * without taking neighbors into account.
+         *
+         * Usage of this function is faster than
+         * nodeDisparities(),
+         * because this class member doesn't create useless vector.
+         */
+        size_t maxDisparity(const DisparityNode& node) const
+        {
+            this->checkNode(node);
+            return min(
+                this->leftImage_.columns() - node.column,
+                +DisparityNode::MAX_DISPARITY
+            );
+        }
+        /**
+         * \brief Minimal disparities of neighbor of the node,
+         * which takes disparity of current node into account.
+         *
+         * Usage of this function is faster than
+         * neighborDisparities()
+         * because this class member doesn't create useless vector.
+         */
+        size_t minNeighborDisparity(
+            const DisparityNode& node, DisparityNode neighbor)
+            const
+        {
+            this->checkNode(node);
+            this->checkNode(neighbor);
+
+            if (node.row != neighbor.row && !this->edgeExists(node, neighbor))
+            {
+                return 0;
+            }
+            if (node.row != neighbor.row)
+            {
+                return 0;
+            }
+            else if (node.row == neighbor.row
+                  && node.column == neighbor.column + 1)
+            {
+                return 0;
+            }
+            else if (node.row == neighbor.row
+                  && node.column + 1 == neighbor.column)
+            {
+                return node.disparity ? node.disparity - 1 : 0;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        /**
+         * \brief Maximal disparities of neighbor of the node,
+         * which takes disparity of current node into account.
+         *
+         * Usage of this function is faster than
+         * neighborDisparities()
+         * because this class member doesn't create useless vector.
+         */
+        size_t maxNeighborDisparity(
+            const DisparityNode& node, const DisparityNode& neighbor)
+            const
+        {
+            this->checkNode(node);
+            this->checkNode(neighbor);
+            size_t columns = this->leftImage_.columns();
+
+            if (node.row != neighbor.row && !this->edgeExists(node, neighbor))
+            {
+                return 0;
+            }
+            if (node.row != neighbor.row)
+            {
+                return min(
+                    columns - neighbor.column,
+                    +DisparityNode::MAX_DISPARITY
+                );
+            }
+            else if (node.row == neighbor.row
+                  && node.column == neighbor.column + 1)
+            {
+                return min(
+                    node.disparity + 2,
+                    +DisparityNode::MAX_DISPARITY
+                );
+            }
+            else if (node.row == neighbor.row
+                  && node.column + 1 == neighbor.column)
+            {
+                return min(
+                    columns - neighbor.column,
+                    +DisparityNode::MAX_DISPARITY
+                );
+            }
+            else
+            {
+                return 0;
             }
         }
         /**
@@ -447,6 +627,24 @@ template<typename Color> class DisparityGraph
         double nodePenalty(size_t row, size_t column, size_t disparity) const
         {
             return this->nodePenalty({row, column, disparity});
+        }
+        /**
+         * \brief Calculate number of neighbor nodes of the given one.
+         *
+         * There are four possible neighbors:
+         * left, right, top and bottom.
+         *
+         * If the pixel of located in a corder or on a border,
+         * it obviously has less number of neighbors.
+         */
+        size_t nodeNeighborsCount(const DisparityNode& node,
+                                  bool directed = false) const
+        {
+            return
+                (node.row > 0 && !directed)
+                + (node.row < this->rightImage_.rows() - 1)
+                + (node.column > 0 && !directed)
+                + (node.column < this->rightImage_.columns() - 1);
         }
         /**
          * \brief Get number of columns of the right image.
