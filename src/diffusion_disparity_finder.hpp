@@ -340,7 +340,7 @@ template <typename Color> class DiffusionDisparityFinder
                                 this->booleanGraph_.removeEdge(node, neighbor);
                             }
                             assert(this->passedPenalty_(node, neighbor)
-                                   + this->graph_.penalty(node, neighbor, true)
+                                   + this->graph_.penalty(node, neighbor)
                                    + threshold
                                    >= minPenalty);
                         }
