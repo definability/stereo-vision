@@ -292,7 +292,6 @@ template<typename Color> class DisparityGraph
                                             bool directed = false) const
         {
             this->checkNode(node);
-            assert(node.index != -1);
             vector<DisparityNode> result;
 
             if (node.column < this->rightImage_.columns() - 1)
