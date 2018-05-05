@@ -236,12 +236,12 @@ template <typename Color> class DiffusionDisparityFinder
         void processNode_(const DisparityNode& node)
         {
             double nodePenalty = 0;
-            double accumulatedPenalty = 0;
 
             const vector<DisparityNode>& neighbors =
                 this->graph_.nodeNeighbors(node);
             for (const DisparityNode& neighbor : neighbors)
             {
+                double accumulatedPenalty = 0;
                 accumulatedPenalty = this->minEdgePenalty_(
                     node,
                     neighbor
@@ -339,10 +339,6 @@ template <typename Color> class DiffusionDisparityFinder
                             {
                                 this->booleanGraph_.removeEdge(node, neighbor);
                             }
-                            assert(this->passedPenalty_(node, neighbor)
-                                   + this->graph_.penalty(node, neighbor)
-                                   + threshold
-                                   >= minPenalty);
                         }
                     }
                 }
