@@ -9,8 +9,9 @@ and this project adheres to [Semantic Versioning].
 
 ### Added
 
-- `DisparityFinder` base class.
-- `BooleanGraph` class.
+- `DisparityFinder` base class to find matches between binocular stereo images.
+- `BooleanGraph` class to check existence of any labeling in boolean graph.
+- `DiffusionDisparityFinder` class to find disparities with diffusion algorithm.
 
 ### Fixed
 

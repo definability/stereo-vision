@@ -40,7 +40,8 @@ template <typename Color> class BFDisparityFinder
                 labeling.setNode({
                     currentNode->row,
                     currentNode->column,
-                    disparity
+                    disparity,
+                    currentNode->index
                 });
 
                 if (labeling.penalty() < bestLabeling.penalty())

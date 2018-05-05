@@ -145,6 +145,15 @@ template<typename Color> class Labeling
             this->penalty_ = numeric_limits<double>::infinity();
         }
         /**
+         * \brief Change disparity of the node.
+         */
+        void setNodeForce(const DisparityNode& node)
+        {
+            this->graph_.checkNode(node);
+            *(this->nodeIterator_(node)) = node;
+            this->penalty_ = numeric_limits<double>::infinity();
+        }
+        /**
          * \brief Get disparity of the node.
          */
         size_t disparity(const DisparityNode& node) const

@@ -1,9 +1,9 @@
 #include "testbf_disparity_finder.hpp"
 
-#include "bf_disparity_finder.hpp"
-#include "disparity_graph.hpp"
-#include "labeling.hpp"
 #include "matrix.hpp"
+#include "labeling.hpp"
+#include "disparity_graph.hpp"
+#include "bf_disparity_finder.hpp"
 
 TEST(BFDisparityFinderTest, CreateSuccessful)
 {
