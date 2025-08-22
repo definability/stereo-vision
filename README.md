@@ -6,6 +6,10 @@
 
 Implementation of algorithms for stereo vision.
 
+The project was commercialised and copyrighted in another place,
+so this repository is abandoned and archived.
+You may be interested in https://github.com/definability/python_scanline_stereo.
+
 # Development
 
 ## Build
